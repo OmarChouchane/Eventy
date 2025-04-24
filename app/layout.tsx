@@ -30,18 +30,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      
+    <ClerkProvider dynamic>
     <html lang="en">
       <body
         className={poppins.variable}>
-          <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
           {children}
         </body>
     </html>
