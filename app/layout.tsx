@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider dynamic>
+    <ClerkProvider dynamic afterSignOutUrl="/">
     <html lang="en">
       <body
         className={poppins.variable}>
