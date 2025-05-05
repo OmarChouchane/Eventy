@@ -3,17 +3,21 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-}
-
-// Extend the global object to include `mongoose`
-declare global {
-  var mongoose: MongooseCache;
-}
-
-// Ensure global.mongoose exists
-const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
+  }
+  
+  declare global {
+    // eslint-disable-next-line no-var
+    var mongoose: MongooseCache;
+  }
+  
+  const globalWithMongoose = global as typeof globalThis & {
+    mongoose: MongooseCache;
+  };
+  
+  const cached = globalWithMongoose.mongoose || { conn: null, promise: null };
+  
 
 export const connectToDatabase = async () => {
   if (cached.conn) return cached.conn;
