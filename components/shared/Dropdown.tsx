@@ -45,13 +45,17 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
 
     useEffect(() => {
         const getCategories = async () => {
+          try {
             const categorieList = await getAllCategories();
-
-            categorieList && setCategories(categorieList as ICategory[])
-        }
-
+            if (categorieList) setCategories(categorieList as ICategory[]);
+          } catch (err) {
+            console.error("Failed to fetch categories", err);
+          }
+        };
+      
         getCategories();
-    })
+      }, []);
+      
 
 
     return (
