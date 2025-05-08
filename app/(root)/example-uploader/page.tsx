@@ -8,8 +8,6 @@ export default function Home() {
       <UploadButton
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
-          console.log("✅ Upload complete callback fired");
-          console.log("Files: ", res);
           alert("Upload Completed");
         }}
         onUploadError={(error: Error) => {

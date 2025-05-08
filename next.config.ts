@@ -1,10 +1,16 @@
-import type { NextConfig } from "next";
+import { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  env: {
-    UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
-    UPLOADTHING_APP_ID: process.env.UPLOADTHING_APP_ID,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "wxuvdw0gh5.ufs.sh",
+        port: "",
+        search: "",
+      },
+    ],
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -68,19 +68,15 @@ const EventForm = ({ userId, type }: EventFormProps) => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
 
-    console.log(" form submitted ")
-    console.log("Form values", values)
 
     let uploadedImageUrl = values.imageUrl;
 
-    console.log("Files", files)
  
 
     if (files.length > 0) {
       
       const uploadedImages = await startUpload(files)
 
-      console.log("uploadedImages", uploadedImages)
 
       if (!uploadedImages) {
         console.error("Failed to upload image");
@@ -101,7 +97,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
         if(newEvent) {
           form.reset();
-          alert('Event created successfully!')
+          router.push(`/events/${newEvent._id}`);
 
         }
       } catch (error) {
