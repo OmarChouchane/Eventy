@@ -1,10 +1,8 @@
 "use client";
 
-
+// Removed FileWithPath as it is not exported by "@uploadthing/react"
 import { useDropzone } from "@uploadthing/react";
-
 import { useCallback, type Dispatch, type SetStateAction } from "react";
-import type { FileWithPath } from "react-dropzone";
 import { generateClientDropzoneAccept } from "uploadthing/client";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +19,7 @@ export const FileUploader = ({
   onFieldChange,
   setFiles,
 }: FileUploaderProps) => {
-  const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
     onFieldChange(convertFileToUrl(acceptedFiles[0]));
   }, []);
@@ -56,7 +54,7 @@ export const FileUploader = ({
             height={77}
             alt="file upload"
           />
-          <h3 className="mb-2 mt-2">Drag event photo here</h3>
+          <h3 className="mb-2 mt-2">Drag photo here</h3>
           <p className="p-medium-12 mb-4">SVG, PNG, JPG</p>
           <Button type="button" className="rounded-full">
             Select from computer

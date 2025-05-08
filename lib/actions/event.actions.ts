@@ -8,9 +8,11 @@ import User from "../database/models/user.model"
 import Event from "../database/models/event.model"
 
 export const createEvent = async ( {event, userId, path}:CreateEventParams ) => {
-    console.log("Creating event...")
-    console.log("Event data: ", event)
-    console.log("User ID: ", userId)
+
+    console.log("Event data", event)
+    console.log("User ID", userId)
+    
+
     try {
 
         const existingEvent = await Event.findOne({ path: path }); // Use a unique identifier (like `path`)
@@ -18,13 +20,6 @@ export const createEvent = async ( {event, userId, path}:CreateEventParams ) => 
         throw new Error("Event already exists.");
         }
 
-
-        console.log("Creating event...")
-        console.log("Event data: ", event)
-        console.log("User ID: ", userId)
-        console.log("Path: ", path)
-        console.log("Event category ID: ", event.categoryId)
-        console.log("Event organizer ID: ", userId)
         
         await connectToDatabase();
 

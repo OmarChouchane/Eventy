@@ -6,6 +6,8 @@ const CreateEvent = async () => {
 
     const userId = sessionClaims?.userId as string;
 
+    console.log("User ID from Clerk:", userId);
+
 
     return (
         <>

@@ -22,7 +22,8 @@ import { FileUploader } from "./FileUploader"
 import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker";
-import { useUploadThing } from "@/lib/uploadthing"
+import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
+
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -33,7 +34,7 @@ import { useRouter } from "next/navigation"
 import { createEvent } from "@/lib/actions/event.actions"
 import { handleError } from "@/lib/utils"
 import { useEffect } from 'react';
-
+import { useUploadThing } from "@/lib/uploadthing"
 
 
 
@@ -48,11 +49,6 @@ type EventFormProps = {
 
 const EventForm = ({ userId, type }: EventFormProps) => {
 
-  useEffect(() => {
-    console.log("EventForm component rendered.");
-  }, []); // This will run only once when the component is mounted
-  
-  
 
   const [files, setFiles] = useState<File[]>([])
   const initialValues = eventDefaultValues;
@@ -61,10 +57,6 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
   const router = useRouter();
 
-  useEffect(() => {
-    console.log("Files state on mount:", files);
-  }, [files]); // This will log whenever the `files` state changes
-  
 
 
   // 1. Define your form.
@@ -75,16 +67,20 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    console.log("onSubmit triggered with values: ", values);
-    console.log("Files: ", files);
-    console.log("Form values: ", values)
-    console.log("Files: ", files)
-    console.log("User ID: ", userId)
+
+    console.log(" form submitted ")
+    console.log("Form values", values)
 
     let uploadedImageUrl = values.imageUrl;
 
+    console.log("Files", files)
+ 
+
     if (files.length > 0) {
+      
       const uploadedImages = await startUpload(files)
+
+      console.log("uploadedImages", uploadedImages)
 
       if (!uploadedImages) {
         console.error("Failed to upload image");
@@ -95,7 +91,6 @@ const EventForm = ({ userId, type }: EventFormProps) => {
     }
 
     if (type === "Create") {
-      console.log("Creating event... but only after user action, not on mount");
 
       try {
         const newEvent = await createEvent({
@@ -106,7 +101,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
         if(newEvent) {
           form.reset();
-          router.push(`/events/${newEvent._id}`)
+          alert('Event created successfully!')
 
         }
       } catch (error) {
@@ -175,22 +170,23 @@ const EventForm = ({ userId, type }: EventFormProps) => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormControl className="h-72">
-                  <FileUploader
-                    onFieldChange={field.onChange}
-                    imageUrl={field.value}
-                    setFiles={setFiles}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+<FormField
+  control={form.control}
+  name="imageUrl"
+  render={({ field }) => (
+    <FormItem className="w-full">
+      <FormControl className="h-72">
+        <FileUploader
+          onFieldChange={field.onChange}        // Updates the field in React Hook Form
+          imageUrl={field.value}                 // Used to display the uploaded file URL
+          setFiles={setFiles}                    // Updates the file state
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
         </div>
 
         <div className="flex flex-col gap-5 md:flex-row">

@@ -15,6 +15,16 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
+  const { nextUrl } = req;
+
+// Skip authentication for API routes that handle their own auth
+if (nextUrl.pathname.startsWith('/api/uploadthing') ||
+nextUrl.pathname.startsWith('/api/groups')) {
+return;
+}
+
+
+
   // Allow access to public routes
   if (isPublicRoute(req)) {
     return NextResponse.next();
