@@ -1,21 +1,32 @@
-import { getEventById } from '@/lib/actions/event.actions'
+import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.actions'
 import { formatDateTime } from '@/lib/utils';
 import { SearchParamProps } from '@/types'
 import Image from 'next/image';
 import { format } from 'path';
 import React from 'react'
+import Collection from '@/components/shared/Collection';
 
 
 
-const EventDetails = async ({ params }: SearchParamProps) => {
+const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   
+
   // Await params before using its properties
   const { id } = await params;  // Awaiting params to ensure it's resolved
 
   const event = await getEventById(id);
 
+  const relatedEvents = await getRelatedEventsByCategory({
+    categoryId: event.category._id,
+    eventId: event._id,
+    page: searchParams.page as string
+  })
+
   return (
-    <section className="flex justify-center bg-primary-50 bg-dotted-pattern bg-contain">
+
+    <>
+
+      <section className="flex justify-center bg-primary-50 bg-dotted-pattern bg-contain">
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:max-w-7xl">
           <Image
             src={event.imageUrl}
@@ -49,7 +60,7 @@ const EventDetails = async ({ params }: SearchParamProps) => {
               </div>
             </div>
 
-            
+
 
             <div className="flex flex-col gap-5">
               <div className="flex gap-2 md:gap-3">
@@ -91,6 +102,23 @@ const EventDetails = async ({ params }: SearchParamProps) => {
           </div>
         </div>
       </section>
+
+      {/* EVENTS WITH THE SAME CATEGORY */}
+      <section className='wrapper my-8 flex flex-col gap-8 md:gap-12'>
+        <h2 className='h2-bold'>Related Events</h2>
+
+        <Collection
+                    data={relatedEvents?.data}
+                    emptyTitle="No Events Found"
+                    emptyStateSubtext="Come back later"
+                    collectionType="All_Events"
+                    limit={6}
+                    page={1}
+                    totalPages={2}
+                  />
+      </section>
+
+    </>
   );
 };
 
