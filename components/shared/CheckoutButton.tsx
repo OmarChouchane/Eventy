@@ -1,4 +1,4 @@
-"usee client"
+"use client"
 
 import React from 'react'
 import { IEvent } from '@/lib/database/models/event.model'
@@ -11,8 +11,12 @@ const CheckoutButtons = ({ event }: {event : IEvent })=> {
   const hasEventFinished = new Date(event.endDateTime) < new Date();
 
   return (
-    <div>
-      
+    <div className='flex items-center gap-3'>
+      {hasEventFinished ? (
+        <p>Sorry, tickets are no longer available.</p>
+      ): (
+        <>button</>
+      )}
     </div>
   )
 }
