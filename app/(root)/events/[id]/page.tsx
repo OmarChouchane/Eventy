@@ -59,6 +59,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
                   </span>
                 </p>
               </div>
+              <CheckoutButton event={event} />
             </div>
 
 
@@ -104,7 +105,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
         </div>
       </section>
 
-      <CheckoutButton event={event} />
+      
 
       {/* EVENTS WITH THE SAME CATEGORY */}
       <section className='wrapper my-8 flex flex-col gap-8 md:gap-12'>
