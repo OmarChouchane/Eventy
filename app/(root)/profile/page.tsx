@@ -11,7 +11,6 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
     const { sessionClaims } = await auth();
     const userId = sessionClaims?.userId as string;
 
-    const ordersPage = Number(searchParams?.ordersPage) || 1;
     const eventsPage = Number(searchParams?.ordersPage) || 1;
 
 

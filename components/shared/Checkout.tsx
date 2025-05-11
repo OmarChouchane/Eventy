@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { IEvent } from '@/lib/database/models/event.model'
 
-const Checkout = ( {event, userId}: {event: IEvent, userId: string} ) => {
+const Checkout = ( {event}: {event: IEvent} ) => {
 
 
     const onCheckout = async () => {

@@ -2,7 +2,6 @@
 
 import { CreateCategoryParams } from "@/types"
 import { handleError } from "../utils"
-import { connect } from "http2"
 import { connectToDatabase } from "../database"
 import  Category  from "../database/models/category.model"
 

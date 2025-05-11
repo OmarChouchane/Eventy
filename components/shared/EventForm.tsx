@@ -7,10 +7,8 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -22,21 +20,17 @@ import { FileUploader } from "./FileUploader"
 import { useState } from "react"
 import Image from "next/image"
 import DatePicker from "react-datepicker";
-import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
 
 
 import "react-datepicker/dist/react-datepicker.css";
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import path from "path"
 import { useRouter } from "next/navigation"
 import { createEvent, updateEvent } from "@/lib/actions/event.actions"
 import { handleError } from "@/lib/utils"
-import { useEffect } from 'react';
 import { useUploadThing } from "@/lib/uploadthing"
 import { IEvent } from "@/lib/database/models/event.model"
-import { start } from "repl"
 
 
 
