@@ -55,7 +55,7 @@ const Card = async ({ event, hasOrderLink=true, hidePrice }: CardPropsType) => {
             {event.isFree ? "FREE" : `$${event.price}`}
           </span>
           <p className="p-semibold-14 w-min rounded-full bg-gray-500/10 px-4 py-1 text-gray-500 line-clamp-1">
-            {event.category.name}
+            {event.category?.name || "No Category"}
           </p>
         </div>
       )}
