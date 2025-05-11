@@ -15,12 +15,19 @@ import type {
   GetEventsByUserParams,
   GetRelatedEventsByCategoryParams,
 } from "@/types";
+import type { IEvent } from "@/lib/database/models/event.model";
+import type { HydratedDocument, QueryWithHelpers } from "mongoose";
 
 const getCategoryByName = async (name: string) => {
   return Category.findOne({ name: { $regex: name, $options: "i" } });
 };
 
-const populateEvent = (query: any) => {
+const populateEvent = (
+  query: QueryWithHelpers<
+    HydratedDocument<IEvent, {}>[],
+    HydratedDocument<IEvent, {}>
+  >
+) => {
   return query
     .populate({
       path: "organizer",
@@ -56,7 +63,15 @@ export async function getEventById(eventId: string) {
   try {
     await connectToDatabase();
 
-    const event = await populateEvent(Event.findById(eventId));
+    const event = await Event.findById(eventId).populate({
+      path: "organizer",
+      model: User,
+      select: "_id firstName lastName",
+    }).populate({
+      path: "category",
+      model: Category,
+      select: "_id name",
+    });
 
     if (!event) throw new Error("Event not found");
 
