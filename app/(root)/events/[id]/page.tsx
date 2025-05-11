@@ -2,7 +2,6 @@ import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.ac
 import { formatDateTime } from '@/lib/utils';
 import { SearchParamProps } from '@/types'
 import Image from 'next/image';
-import { format } from 'path';
 import React from 'react'
 import { Collection } from '@/components/shared/Collection';
 import CheckoutButton from '@/components/shared/CheckoutButton';
