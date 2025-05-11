@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import React from 'react'
-import Collection from '@/components/shared/Collection'
+import { Collection } from '@/components/shared/Collection'
 import { auth } from '@clerk/nextjs/server'
 import { getEventsByUser } from '@/lib/actions/event.actions'
 import { SearchParamProps } from '@/types'
@@ -46,9 +46,9 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
                     emptyStateSubtext="No worries! You can explore more events by clicking the button above."
                     collectionType="My_Tickets"
                     limit={3}
-                    page={1}
+                    page={searchParams?.ordersPage as string || '1'}
                     urlParamName='ordersPage'
-                    totalPages={2}
+                    total={organizedEvents?.totalPages}
                 />
             </section>
 

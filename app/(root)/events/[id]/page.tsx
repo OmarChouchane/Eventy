@@ -4,7 +4,7 @@ import { SearchParamProps } from '@/types'
 import Image from 'next/image';
 import { format } from 'path';
 import React from 'react'
-import Collection from '@/components/shared/Collection';
+import { Collection } from '@/components/shared/Collection';
 import CheckoutButton from '@/components/shared/CheckoutButton';
 
 
@@ -117,8 +117,8 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
                     emptyStateSubtext="Come back later"
                     collectionType="All_Events"
                     limit={6}
-                    page={1}
-                    totalPages={2}
+                    page={Array.isArray(searchParams?.page) ? searchParams.page[0] || 1 : searchParams?.page || 1}
+                    total={event?.totalPages || 0}
                   />
       </section>
 
