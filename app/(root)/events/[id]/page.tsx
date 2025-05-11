@@ -11,8 +11,7 @@ import CheckoutButton from '@/components/shared/CheckoutButton';
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   
 
-  // Await params before using its properties
-  const { id } = await params;  // Awaiting params to ensure it's resolved
+  const { id } = params;
 
   const event = await getEventById(id);
 
