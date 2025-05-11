@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { format } from 'path';
 import React from 'react'
 import Collection from '@/components/shared/Collection';
+import CheckoutButton from '@/components/shared/CheckoutButton';
 
 
 
@@ -102,6 +103,8 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
           </div>
         </div>
       </section>
+
+      <CheckoutButton event={event} />
 
       {/* EVENTS WITH THE SAME CATEGORY */}
       <section className='wrapper my-8 flex flex-col gap-8 md:gap-12'>
