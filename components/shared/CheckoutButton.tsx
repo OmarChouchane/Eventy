@@ -2,7 +2,10 @@
 
 import React from 'react'
 import { IEvent } from '@/lib/database/models/event.model'
-import { useUser } from '@clerk/nextjs'
+import { SignedIn, SignedOut, useUser } from '@clerk/nextjs'
+import { Button } from '../ui/button'
+import Link from 'next/link'
+import Checkout from './Checkout'
 
 const CheckoutButtons = ({ event }: {event : IEvent })=> {
 
@@ -13,9 +16,23 @@ const CheckoutButtons = ({ event }: {event : IEvent })=> {
   return (
     <div className='flex items-center gap-3'>
       {hasEventFinished ? (
-        <p>Sorry, tickets are no longer available.</p>
+        <p className='p-2 text-red-400'>Sorry, tickets are no longer available.</p>
       ): (
-        <>button</>
+        <>
+        <SignedOut>
+          <Button asChild className='button rounded-full'>
+            <Link href="/sign-in">
+            Get Tickets
+            </Link>
+          </Button>
+        </SignedOut>
+
+        <SignedIn>
+          <Checkout event={event} userId={userId}>
+            
+          </Checkout>
+        </SignedIn>
+        </>
       )}
     </div>
   )
