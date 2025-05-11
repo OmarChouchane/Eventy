@@ -24,8 +24,8 @@ const getCategoryByName = async (name: string) => {
 
 const populateEvent = (
   query: QueryWithHelpers<
-    HydratedDocument<IEvent, {}>[],
-    HydratedDocument<IEvent, {}>
+    HydratedDocument<IEvent>[],
+    HydratedDocument<IEvent>
   >
 ) => {
   return query
@@ -36,6 +36,7 @@ const populateEvent = (
     })
     .populate({ path: "category", model: Category, select: "_id name" });
 };
+
 
 // CREATE
 export async function createEvent({ userId, event, path }: CreateEventParams) {
