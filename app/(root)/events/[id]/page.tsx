@@ -9,16 +9,18 @@ import CheckoutButton from '@/components/shared/CheckoutButton';
 
 
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
-  
+  // now both params & searchParams are Promises…
+  const { id } = await params;
+  const resolvedSearchParams = await searchParams;
+  const { page = '1' } = resolvedSearchParams;
 
-  const { id } = params;
 
   const event = await getEventById(id);
 
   const relatedEvents = await getRelatedEventsByCategory({
     categoryId: event.category._id,
     eventId: event._id,
-    page: searchParams.page as string
+    page: resolvedSearchParams.page as string
   })
 
   return (
