@@ -28,7 +28,7 @@ const CheckoutButtons = ({ event }: {event : IEvent })=> {
         </SignedOut>
 
         <SignedIn>
-          <Checkout event={event} userId={userId}>
+          <Checkout event={event}>
             
           </Checkout>
         </SignedIn>

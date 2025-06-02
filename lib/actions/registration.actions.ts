@@ -17,8 +17,8 @@ export const registerToEvent = async ({ eventId, userId }: RegistrationParams) =
     if (existing) return { success: false, message: "Already registered" }
 
     const registration = await Registration.create({ event: eventId, user: userId })
+    return { success: true, data: JSON.parse(JSON.stringify(registration)) }
 
-    return JSON.parse(JSON.stringify(registration))
   } catch (error) {
     handleError(error)
   }
@@ -34,3 +34,18 @@ export const checkUserRegistration = async ({ eventId, userId }: RegistrationPar
     handleError(error)
   }
 }
+
+export const unregisterFromEvent = async ({ eventId, userId }: RegistrationParams) => {
+  try {
+    await connectToDatabase();
+
+    const deleted = await Registration.findOneAndDelete({ event: eventId, user: userId });
+
+    if (!deleted) return { success: false, message: "You are not registered" };
+
+    return { success: true };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
