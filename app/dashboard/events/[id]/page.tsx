@@ -23,12 +23,13 @@ if (!event || !event.organizer || event.organizer._id.toString() !== userId) {
 
 
   return (
+    <div className="bg-dotted-pattern min-h-screen">
     <div className="p-8 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+        <h1 className="text-5xl font-extrabold tracking-tight text-gray-900">
           {event.title}
         </h1>
-        <span className="inline-block px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">
+        <span className="inline-block px-3 py-1 text-m font-semibold bg-blue-100 text-blue-700 rounded-full">
           Dashboard
         </span>
       </div>
@@ -54,11 +55,21 @@ if (!event || !event.organizer || event.organizer._id.toString() !== userId) {
               </div>
               <div className="text-gray-500 text-sm">{reg.user.email}</div>
             </div>
+            <span className="ml-auto text-gray-400 text-xs whitespace-nowrap">
+                {new Date(reg.createdAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                })}
+            </span>
               </li>
             ))
           )}
         </ul>
         </section>
+    </div>
     </div>
   );
 }
