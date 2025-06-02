@@ -11,7 +11,8 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
     const { sessionClaims } = await auth();
     const userId = sessionClaims?.userId as string;
 
-    const eventsPage = Number(searchParams?.ordersPage) || 1;
+    const resolvedSearchParams = await searchParams;
+    const eventsPage = Number(resolvedSearchParams?.ordersPage) || 1;
 
 
     const organizedEvents = await getEventsByUser({ userId, page: eventsPage })
@@ -45,7 +46,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
                     emptyStateSubtext="No worries! You can explore more events by clicking the button above."
                     collectionType="My_Tickets"
                     limit={3}
-                    page={searchParams?.ordersPage as string || '1'}
+                    page={resolvedSearchParams?.ordersPage as string || '1'}
                     urlParamName='ordersPage'
                     total={organizedEvents?.totalPages}
                 />
