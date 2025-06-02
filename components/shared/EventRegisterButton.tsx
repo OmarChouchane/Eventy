@@ -3,6 +3,8 @@
 import React, { useState, useEffect, startTransition } from "react";
 import { registerToEvent, unregisterFromEvent, checkUserRegistration } from "@/lib/actions/registration.actions";
 
+import { sendConfirmationEmail  } from "@/lib/email";
+
 interface EventRegisterButtonProps {
   eventId: string;
   userId: string;
