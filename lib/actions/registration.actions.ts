@@ -1,57 +1,36 @@
 "use server"
 
+import { handleError } from "../utils"
 import { connectToDatabase } from "../database"
 import Registration from "../database/models/registration.model"
-import Event from "../database/models/event.model"
-import User from "../database/models/user.model"
-import { handleError } from "../utils"
 
-// Register a user to an event
-export const registerToEvent = async (eventId: string, userId: string) => {
+interface RegistrationParams {
+  eventId: string
+  userId: string
+}
+
+export const registerToEvent = async ({ eventId, userId }: RegistrationParams) => {
   try {
     await connectToDatabase()
 
-    // Prevent duplicate registration
-    const existingRegistration = await Registration.findOne({ event: eventId, user: userId })
+    const existing = await Registration.findOne({ event: eventId, user: userId })
+    if (existing) return { success: false, message: "Already registered" }
 
-    if (existingRegistration) return false
+    const registration = await Registration.create({ event: eventId, user: userId })
 
-    const user = await User.findById(userId)
-    const event = await Event.findById(eventId)
-
-    if (!user || !event) throw new Error("User or event not found")
-
-    const newRegistration = await Registration.create({
-      user: {
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      },
-      event: {
-        _id: event._id,
-        title: event.title,
-        startDateTime: event.startDateTime,
-        endDateTime: event.endDateTime,
-      },
-    })
-
-    return JSON.parse(JSON.stringify(newRegistration))
+    return JSON.parse(JSON.stringify(registration))
   } catch (error) {
     handleError(error)
   }
 }
 
-// Check if a user is already registered
-export const checkUserRegistration = async (eventId: string, userId: string) => {
+export const checkUserRegistration = async ({ eventId, userId }: RegistrationParams) => {
   try {
     await connectToDatabase()
 
     const registration = await Registration.findOne({ event: eventId, user: userId })
-
-    return Boolean(registration)
+    return !!registration
   } catch (error) {
     handleError(error)
-    return false
   }
 }
