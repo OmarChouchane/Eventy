@@ -1,0 +1,231 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { FaBoxOpen, FaDesktop, FaChalkboardTeacher, FaTrash, FaEdit } from "react-icons/fa";
+
+const getResourceIcon = (type: string) => {
+    switch (type) {
+        case "room":
+            return <FaChalkboardTeacher className="text-indigo-500 w-6 h-6 mr-3" />;
+        case "equipment":
+        case "audiovisual":
+            return <FaDesktop className="text-green-500 w-6 h-6 mr-3" />;
+        case "material":
+            return <FaBoxOpen className="text-yellow-500 w-6 h-6 mr-3" />;
+        default:
+            return <FaBoxOpen className="text-gray-400 w-6 h-6 mr-3" />;
+    }
+};
+
+interface Resource {
+    _id: string;
+    name: string;
+    type: string;
+    quantity: number;
+    description?: string;
+}
+
+export default function ResourceCatalog() {
+    const [resources, setResources] = useState<Resource[]>([]);
+    const [form, setForm] = useState({
+        name: "",
+        type: "",
+        quantity: 1,
+        description: "",
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [activeTab, setActiveTab] = useState<"catalog" | "add">("catalog");
+
+    useEffect(() => {
+        fetchResources();
+    }, []);
+
+    const fetchResources = async () => {
+        try {
+            const res = await fetch("/api/resources");
+            const data = await res.json();
+            setResources(data);
+        } catch (e) {
+            setError("Failed to load resources");
+        }
+    };
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+
+        try {
+            const res = await fetch("/api/resources", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: form.name,
+                    type: form.type,
+                    quantity: Number(form.quantity),
+                    description: form.description,
+                }),
+            });
+
+            if (!res.ok) throw new Error("Failed to add resource");
+
+            const newResource = await res.json();
+            setResources((prev) => [...prev, newResource]);
+            setForm({ name: "", type: "", quantity: 1, description: "" });
+            setActiveTab("catalog");
+        } catch (e) {
+            setError((e as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+            {/* Navbar */}
+            <nav className="flex mb-6 border-b">
+                <button
+                    className={`px-4 py-2 font-semibold transition ${
+                        activeTab === "catalog"
+                            ? "border-b-2 border-primary-500 text-primary-600"
+                            : "text-gray-500 hover:text-primary-500"
+                    }`}
+                    onClick={() => setActiveTab("catalog")}
+                >
+                    Catalog
+                </button>
+                <button
+                    className={`px-4 py-2 font-semibold transition ${
+                        activeTab === "add"
+                            ? "border-b-2 border-primary-500 text-primary-600"
+                            : "text-gray-500 hover:text-primary-500"
+                    }`}
+                    onClick={() => setActiveTab("add")}
+                >
+                    Add New Resource
+                </button>
+            </nav>
+
+            {/* Tab Content */}
+            {activeTab === "catalog" && (
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {resources.length === 0 && (
+                        <li className="col-span-full text-center text-gray-500 py-8">
+                            No resources found.
+                        </li>
+                    )}
+
+                    {resources.map((r) => (
+                        <li
+                            key={r._id}
+                            className="flex items-start bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow w-full"
+                        >
+                            {getResourceIcon(r.type)}
+
+                            <div className="flex-1 w-full">
+                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                                    {r.name}
+                                    <span className="text-sm font-medium text-indigo-600 bg-indigo-100 rounded px-2 py-0.5 ml-auto">
+                                        {r.type}
+                                    </span>
+                                </h3>
+                                <p className="text-gray-600 mt-1">Quantity: {r.quantity}</p>
+                                {r.description && (
+                                    <p className="text-gray-500 mt-2 italic text-sm">
+                                        {r.description}
+                                    </p>
+                                )}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {activeTab === "add" && (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block font-medium mb-1" htmlFor="name">
+                            Name *
+                        </label>
+                        <input
+                            id="name"
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            required
+                            className="border rounded p-2 w-full"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-medium mb-1" htmlFor="type">
+                            Type *
+                        </label>
+                        <select
+                            id="type"
+                            name="type"
+                            value={form.type}
+                            onChange={handleChange}
+                            required
+                            className="border rounded p-2 w-full"
+                        >
+                            <option value="">Select type</option>
+                            <option value="room">Room</option>
+                            <option value="audiovisual">Audiovisual</option>
+                            <option value="material">Material</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block font-medium mb-1" htmlFor="quantity">
+                            Quantity *
+                        </label>
+                        <input
+                            id="quantity"
+                            name="quantity"
+                            type="number"
+                            min={1}
+                            value={form.quantity}
+                            onChange={handleChange}
+                            required
+                            className="border rounded p-2 w-full"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-medium mb-1" htmlFor="description">
+                            Description
+                        </label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange}
+                            rows={3}
+                            className="border rounded p-2 w-full"
+                        />
+                    </div>
+
+                    {error && <p className="text-red-600">{error}</p>}
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="bg-primary-500 text-white px-4 py-2 rounded hover:bg-primary-600 disabled:opacity-50"
+                    >
+                        {loading ? "Adding..." : "Add Resource"}
+                    </button>
+                </form>
+            )}
+        </div>
+    );
+}
