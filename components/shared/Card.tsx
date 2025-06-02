@@ -17,7 +17,7 @@ const Card = async ({ event, hasOrderLink=true, hidePrice }: CardPropsType) => {
 
     const { sessionClaims } = await auth();
     const userId = sessionClaims?.userId as string;
-    const isEventCreatot = event.organizer._id.toString() === userId;
+    const isEventCreator = event.organizer._id.toString() === userId;
 
     
 
@@ -32,7 +32,7 @@ const Card = async ({ event, hasOrderLink=true, hidePrice }: CardPropsType) => {
       tabIndex={-1}
     />
 
-    {isEventCreatot && !hidePrice && (
+    {isEventCreator && !hidePrice && (
       <div className="absolute right-2 top-2 flex flex-col gap-4 rounded-xl bg-white p-3 shadow-sm transition-all">
         <Link href={`/events/${event._id}/update`}>
           <Image
