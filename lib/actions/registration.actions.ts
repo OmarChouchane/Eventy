@@ -25,12 +25,21 @@ export const registerToEvent = async ({ eventId, userId }: RegistrationParams) =
     const user = await User.findById(userId);
     const event = await Event.findById(eventId);
 
-    // Send confirmation email
-    await sendConfirmationEmail(
-      user?.email,
-      "Registration Confirmation",
-      `<p>Thank you for registering to event ${event?.title || "the event"}!</p>`
-    );
+ 
+    if (event && user) {
+      await sendConfirmationEmail({
+        to: user.email,
+        event: {
+          title: event.title,
+          description: event.description,
+          location: event.location,
+          startDateTime: event.startDateTime,
+          endDateTime: event.endDateTime,
+          imageUrl: event.image,
+        },
+      });
+    }
+
 
     return { success: true, data: JSON.parse(JSON.stringify(registration)) }
 
