@@ -68,7 +68,13 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardPropsType) =>
             </p>
 
             {/* Replace previous Register Link with new Register Button */}
-            {!isEventCreator && <EventRegisterButton eventId={event._id} userId={userId} />}
+            {!isEventCreator ? (<EventRegisterButton eventId={event._id} userId={userId} />) :
+              <Link
+                href={`/dashboard/events/${event._id}`}
+                className="p-semibold-14 rounded-full px-4 py-1 text-white bg-orange-600 hover:bg-red-700 transition ml-auto"
+              >
+                Dashboard
+              </Link>}
           </div>
         )}
 

@@ -73,3 +73,8 @@ export const unregisterFromEvent = async ({ eventId, userId }: RegistrationParam
   }
 };
 
+
+export const getEventRegistrations = async (eventId: string) => {
+  await connectToDatabase();
+  return await Registration.find({ event: eventId }).populate("user");
+};
