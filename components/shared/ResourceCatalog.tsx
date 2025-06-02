@@ -89,6 +89,13 @@ export default function ResourceCatalog() {
         }
     };
 
+    // Group resources by type
+    const groupedResources = resources.reduce<Record<string, Resource[]>>((acc, resource) => {
+        if (!acc[resource.type]) acc[resource.type] = [];
+        acc[resource.type].push(resource);
+        return acc;
+    }, {});
+
     return (
         <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
             {/* Navbar */}
@@ -117,37 +124,52 @@ export default function ResourceCatalog() {
 
             {/* Tab Content */}
             {activeTab === "catalog" && (
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {resources.length === 0 && (
-                        <li className="col-span-full text-center text-gray-500 py-8">
+                <div>
+                    {Object.keys(groupedResources).length === 0 && (
+                        <div className="text-center text-gray-500 py-8">
                             No resources found.
-                        </li>
+                        </div>
                     )}
-
-                    {resources.map((r) => (
-                        <li
-                            key={r._id}
-                            className="flex items-start bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow w-full"
-                        >
-                            {getResourceIcon(r.type)}
-
-                            <div className="flex-1 w-full">
-                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                    {r.name}
-                                    <span className="text-sm font-medium text-indigo-600 bg-indigo-100 rounded px-2 py-0.5 ml-auto">
-                                        {r.type}
-                                    </span>
-                                </h3>
-                                <p className="text-gray-600 mt-1">Quantity: {r.quantity}</p>
-                                {r.description && (
-                                    <p className="text-gray-500 mt-2 italic text-sm">
-                                        {r.description}
-                                    </p>
-                                )}
+                    {Object.entries(groupedResources).map(([type, group]) => (
+                        <div key={type} className="mb-10">
+                            <div className="flex items-center gap-3 mb-5">
+                                <span className="rounded-full bg-gradient-to-tr from-white-500 to-indigo-400 p-4 pl-6 shadow-lg">
+                                    {getResourceIcon(type)}
+                                </span>
+                                <h2 className="text-3xl font-extrabold text-gray-900 capitalize tracking-tight drop-shadow-sm">
+                                    {type}
+                                </h2>
+                                <span className="ml-2 bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                    {group.length} {group.length === 1 ? "item" : "items"}
+                                </span>
                             </div>
-                        </li>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {group.map((r) => (
+                                    <li
+                                        key={r._id}
+                                        className="flex items-start bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow w-full"
+                                    >
+                                        {getResourceIcon(r.type)}
+                                        <div className="flex-1 w-full">
+                                            <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                                                {r.name}
+                                                <span className="text-sm font-medium text-indigo-600 bg-indigo-100 rounded px-2 py-0.5 ml-auto">
+                                                    {r.type}
+                                                </span>
+                                            </h3>
+                                            <p className="text-gray-600 mt-1">Quantity: {r.quantity}</p>
+                                            {r.description && (
+                                                <p className="text-gray-500 mt-2 italic text-sm">
+                                                    {r.description}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
 
             {activeTab === "add" && (
