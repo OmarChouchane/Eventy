@@ -9,9 +9,10 @@ import Link from "next/link";
 
 export default async function Home( { searchParams }: SearchParamProps ) {
 
-  const page = Number(searchParams?.page) || 1;
-  const searchText = (searchParams?.query as string) || '';
-  const category = (searchParams?.category as string) || '';
+  const resolvedSearchParams = await searchParams;
+  const page = Number(resolvedSearchParams?.page) || 1;
+  const searchText = (resolvedSearchParams?.query as string) || '';
+  const category = (resolvedSearchParams?.category as string) || '';
 
   const events = await getAllEvents({
     query: searchText,
@@ -56,14 +57,13 @@ export default async function Home( { searchParams }: SearchParamProps ) {
             <Search />
             <CategoryFilter />
           </div>
-
           <Collection
             data={events?.data}
             emptyTitle="No Events Found"
             emptyStateSubtext="Come back later"
             collectionType="All_Events"
             limit={3}
-            page={Array.isArray(searchParams?.page) ? searchParams.page[0] || 1 : searchParams?.page || 1}
+            page={Array.isArray(resolvedSearchParams?.page) ? resolvedSearchParams.page[0] || 1 : resolvedSearchParams?.page || 1}
             total={events?.totalPages || 0}
           />
 

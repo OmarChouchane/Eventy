@@ -117,7 +117,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
                     emptyStateSubtext="Come back later"
                     collectionType="All_Events"
                     limit={6}
-                    page={Array.isArray(searchParams?.page) ? searchParams.page[0] || 1 : searchParams?.page || 1}
+                    page={Array.isArray(resolvedSearchParams?.page) ? resolvedSearchParams.page[0] || 1 : resolvedSearchParams?.page || 1}
                     total={event?.totalPages || 0}
                   />
       </section>
