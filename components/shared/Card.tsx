@@ -57,6 +57,14 @@ const Card = async ({ event, hasOrderLink=true, hidePrice }: CardPropsType) => {
           <p className="p-semibold-14 w-min rounded-full bg-gray-500/10 px-4 py-1 text-gray-500 line-clamp-1">
             {event.category?.name || "No Category"}
           </p>
+          {!isEventCreator && (
+            <Link
+              href={`/events/${event._id}/register`}
+              className="ml-auto p-semibold-14 w-min rounded-full px-4 py-1 text-white bg-primary-500 transition-all duration-200 hover:bg-white hover:text-primary-500 hover:scale-105 hover:shadow-lg hover:outline hover:outline-1 hover:outline-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400"
+            >
+              Register
+            </Link>
+          )}
         </div>
       )}
 
