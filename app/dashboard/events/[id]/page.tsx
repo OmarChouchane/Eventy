@@ -41,8 +41,8 @@ if (!event || !event.organizer || event.organizer._id.toString() !== userId) {
             <h1 className="text-5xl font-extrabold tracking-tight text-white">
                 {event.title}
             </h1>
-            <span className="inline-block px-3 py-1 text-m font-semibold bg-gray-800 text-blue-300 rounded-full">
-                Dashboard
+            <span className="inline-block px-3 py-1 text-m font-semibold bg-gray-100 text-blue-700 rounded-full">
+              Dashboard
             </span>
         </div>
 
