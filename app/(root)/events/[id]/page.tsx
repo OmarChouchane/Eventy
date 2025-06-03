@@ -7,6 +7,7 @@ import React from 'react'
 import { Collection } from '@/components/shared/Collection';
 import CheckoutButton from '@/components/shared/CheckoutButton';
 import { auth } from "@clerk/nextjs/server"
+import { useState, useEffect } from 'react';
 
 import EventResourceTabs from '@/components/shared/EventResourceTabs';
 
@@ -38,6 +39,9 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
     eventId: event._id,
     page: resolvedSearchParams.page as string
   })
+
+
+  
 
   return (
 
