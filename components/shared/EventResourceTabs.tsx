@@ -83,7 +83,7 @@ useEffect(() => {
   try {
     const res = await fetch("/api/resources", {
       method: "POST",
-      body: JSON.stringify({ action: "book", id }),
+      body: JSON.stringify({ action: "book", id , userId: "user-id-placeholder", eventId }), // Replace with actual user ID
     });
     const data = await res.json();
 
