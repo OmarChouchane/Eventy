@@ -66,6 +66,50 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     };
 
 
+   const fetchBookedResources = async () => {
+  const res = await fetch(`/api/events/${eventId}`);
+  const data = await res.json();
+  setBookedEvents(data.resources);
+}; 
+
+useEffect(() => {
+  fetchResources();
+  fetchBookedResources();
+}, []);
+
+
+
+    const handleBookResource = async (id: string) => {
+  try {
+    const res = await fetch("/api/resources", {
+      method: "POST",
+      body: JSON.stringify({ action: "book", id }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Failed to book");
+    fetchResources(); // refresh list
+  } catch (err) {
+    setError((err as Error).message);
+  }
+};
+
+const handleUnbookResource = async (id: string) => {
+  try {
+    const res = await fetch("/api/resources", {
+      method: "POST",
+      body: JSON.stringify({ action: "unbook", id }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to unbook");
+    fetchResources(); // refresh list
+  } catch (err) {
+    setError((err as Error).message);
+  }
+};
+
+
+
 
     const groupedResources = resources.reduce<Record<string, Resource[]>>((acc, r) => {
         if (!acc[r.type]) acc[r.type] = [];
@@ -137,7 +181,23 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
                                                 )}
                                                 <div className="flex gap-2 mt-3 justify-end w-full">
                                                     <div className="ml-auto flex gap-2">
-                                                     
+                                                        <div className="ml-auto flex gap-2">
+  {r.available > 0 ? (
+    <button
+      onClick={() => handleBookResource(r._id)}
+      className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1 rounded shadow"
+    >
+      Book
+    </button>
+  ) : (
+    <button
+      className="bg-gray-400 hover:bg-gray-500 text-white text-sm px-3 py-1 rounded shadow disabled:opacity-50"
+    >
+      Book
+    </button>
+  )}
+</div>
+
                                                     
                                                     </div>
                                                 </div>

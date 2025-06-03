@@ -19,7 +19,7 @@ const ResourceSchema = new Schema<IResource>(
     name: { type: String, required: true },
     type: {
       type: String,
-      enum: ["room", "equipment", "material"],
+      enum: ["room", "audiovisual", "material"],
       required: true,
     },
     description: { type: String },
