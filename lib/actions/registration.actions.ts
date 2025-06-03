@@ -78,3 +78,63 @@ export const getEventRegistrations = async (eventId: string) => {
   await connectToDatabase();
   return await Registration.find({ event: eventId }).populate("user");
 };
+export const getUserRegistrations = async (userId: string) => {
+  await connectToDatabase();
+  const limit = 10; // or any limit you want
+  const page = 1; // or get from params
+  const skip = (page - 1) * limit;
+
+  const [registrations, eventsCount] = await Promise.all([
+    Registration.find({ user: userId })
+      .populate({
+        path: "event",
+        populate: [
+          { path: "category", select: "_id name" },
+          { path: "organizer", select: "_id firstName lastName" }
+        ]
+      })
+      .skip(skip)
+      .limit(limit),
+    Registration.countDocuments({ user: userId }),
+  ]);
+
+  // Extract and map only the event object with required fields
+  const events = registrations
+    .map((reg) => {
+      const event = reg.event;
+      if (!event) return null;
+      return {
+        _id: event._id,
+        title: event.title,
+        description: event.description,
+        location: event.location,
+        imageUrl: event.imageUrl || event.image, // fallback if field is named 'image'
+        startDateTime: event.startDateTime,
+        endDateTime: event.endDateTime,
+        price: event.price,
+        isFree: event.isFree,
+        url: event.url,
+        category: event.category
+          ? {
+              _id: event.category._id,
+              name: event.category.name,
+            }
+          : null,
+        organizer: event.organizer
+          ? {
+              _id: event.organizer._id,
+              firstName: event.organizer.firstName,
+              lastName: event.organizer.lastName,
+            }
+          : null,
+        createdAt: event.createdAt,
+        __v: event.__v,
+      };
+    })
+    .filter((event) => !!event);
+
+  return {
+    data: JSON.parse(JSON.stringify(events)),
+    totalPages: Math.ceil(eventsCount / limit),
+  };
+};

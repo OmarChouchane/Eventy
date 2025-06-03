@@ -24,10 +24,13 @@ type CardPropsType = {
 }
 
 const Card = async ({ event, hasOrderLink = true, hidePrice }: CardPropsType) => {
+
+  
   const { sessionClaims } = await auth()
   const userId = sessionClaims?.userId as string
-  const isEventCreator = event.organizer._id.toString() === userId
+  const isEventCreator = event.organizer && event.organizer._id && event.organizer._id.toString() === userId
 
+  console.log("Card Rendered", { eventId: event._id, userId, isEventCreator })
   // For registration state & loading, we need React hooks,
   // but since Card is async server component, we must
   // create a client wrapper inside to use hooks.
@@ -58,7 +61,7 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardPropsType) =>
       )}
 
       <div className="flex min-h-[138px] flex-col gap-3 p-5 md:gap-4">
-        {!hidePrice && (
+        
           <div className="flex gap-2 items-center">
             <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-600">
               {event.isFree ? "FREE" : `$${event.price}`}
@@ -76,7 +79,7 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardPropsType) =>
                 Dashboard
               </Link>}
           </div>
-        )}
+        
 
         <p className="p-medium-16 p-medium-18 text-gray-500">{formatDateTime(event.startDateTime).dateTime}</p>
         <Link href={`/events/${event._id}`} className="p-medium016 md:p-medium-20 line-clamp-2 flex-1 text-black text-2xl font-bold">
@@ -85,7 +88,7 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardPropsType) =>
 
         <div className="flex-between w-full">
           <p className="p-medium-14 md:p-medium-16 text-gray-600">
-            {event.organizer.firstName} {event.organizer.lastName}
+            {event.organizer ? `${event.organizer.firstName} ${event.organizer.lastName}` : "Unknown Organizer"}
           </p>
 
           {hasOrderLink && (
