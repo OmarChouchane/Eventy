@@ -20,10 +20,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
-
     const body = await req.json();
 
-    // 🧼 Handle deletion if action is 'delete'
+    // 🔴 DELETE logic
     if (body.action === "delete" && body.id) {
       const deleted = await Resource.findByIdAndDelete(body.id);
       if (!deleted) {
@@ -32,19 +31,34 @@ export async function POST(req: NextRequest) {
           { status: 404 }
         );
       }
-
       return NextResponse.json(
         { message: "Resource deleted successfully" },
         { status: 200 }
       );
     }
 
-    // 🧼 Validate and handle resource creation
-    const { name, type, quantity, description } = body;
+    // 🟡 EDIT logic
+    if (body.action === "edit" && body.id) {
+      const { name, type, quantity, description } = body;
+      const updated = await Resource.findByIdAndUpdate(
+        body.id,
+        { name, type, quantity, description },
+        { new: true }
+      );
+      if (!updated) {
+        return NextResponse.json(
+          { error: "Resource not found or update failed" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(updated, { status: 200 });
+    }
 
+    // 🟢 CREATE logic (default)
+    const { name, type, quantity, description } = body;
     if (!name || !type || !quantity) {
       return NextResponse.json(
-        { error: "Name, type and quantity are required" },
+        { error: "Name, type, and quantity are required" },
         { status: 400 }
       );
     }
