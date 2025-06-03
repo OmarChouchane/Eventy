@@ -1,3 +1,4 @@
+
 import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.actions'
 import { formatDateTime } from '@/lib/utils';
 import { SearchParamProps } from '@/types'
@@ -5,7 +6,14 @@ import Image from 'next/image';
 import React from 'react'
 import { Collection } from '@/components/shared/Collection';
 import CheckoutButton from '@/components/shared/CheckoutButton';
+import { auth } from "@clerk/nextjs/server"
 
+import EventResourceTabs from '@/components/shared/EventResourceTabs';
+
+
+
+
+    
 
 
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
@@ -13,9 +21,17 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
   const { page = '1' } = resolvedSearchParams;
-
-
+  
   const event = await getEventById(id);
+
+  const { sessionClaims } = await auth();
+
+  const userId = sessionClaims?.userId as string;
+
+  const isOrganizer = userId === event.organizer._id;
+
+
+
 
   const relatedEvents = await getRelatedEventsByCategory({
     categoryId: event.category._id,
@@ -105,6 +121,9 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
         </div>
       </section>
 
+
+
+{isOrganizer && <EventResourceTabs eventId={event._id} />}
       
 
       {/* EVENTS WITH THE SAME CATEGORY */}

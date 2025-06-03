@@ -9,7 +9,7 @@ export interface IResource extends Document {
   type: ResourceType;
   description?: string;
   quantity: number;
-  available: boolean;
+  available: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,7 +24,7 @@ const ResourceSchema = new Schema<IResource>(
     },
     description: { type: String },
     quantity: { type: Number, default: 1 },
-    available: { type: Boolean, default: true },
+    available: { type: Number, default: 1 },
   },
   {
     timestamps: true,

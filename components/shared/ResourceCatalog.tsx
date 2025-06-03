@@ -27,6 +27,7 @@ interface Resource {
     name: string;
     type: string;
     quantity: number;
+    available: number;
     description?: string;
 }
 
@@ -235,7 +236,13 @@ export default function ResourceCatalog() {
                                                     {r.type}
                                                 </span>
                                             </h3>
-                                            <p className="text-gray-600 mt-1">Quantity: {r.quantity}</p>
+                                            
+                                            <p className="text-gray-600 mt-1">
+  Quantity: {r.quantity} {" | "} 
+  <span className={r.available === 0 ? "text-red-500" : "text-green-600"}>
+    Available: {r.available}
+  </span>
+</p>
                                             {r.description && (
                                                 <p className="text-gray-500 mt-2 italic text-sm">{r.description}</p>
                                             )}
