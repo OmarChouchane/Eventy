@@ -7,7 +7,6 @@ const getResourceIcon = (type: string) => {
     switch (type) {
         case "room":
             return <FaChalkboardTeacher className="text-indigo-500 w-6 h-6 mr-3" />;
-        case "equipment":
         case "audiovisual":
             return <FaDesktop className="text-green-500 w-6 h-6 mr-3" />;
         case "material":
@@ -50,6 +49,28 @@ export default function ResourceCatalog() {
             setError("Failed to load resources");
         }
     };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this resource?")) return;
+
+        try {
+            const res = await fetch("/api/resources", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ action: "delete", id }),
+            });
+
+            if (!res.ok) throw new Error("Failed to delete resource");
+
+            setResources((prev) => prev.filter((r) => r._id !== id));
+        } catch (e) {
+            setError((e as Error).message);
+        }
+    };
+
+
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -101,21 +122,19 @@ export default function ResourceCatalog() {
             {/* Navbar */}
             <nav className="flex mb-6 border-b">
                 <button
-                    className={`px-4 py-2 font-semibold transition ${
-                        activeTab === "catalog"
+                    className={`px-4 py-2 font-semibold transition ${activeTab === "catalog"
                             ? "border-b-2 border-primary-500 text-primary-600"
                             : "text-gray-500 hover:text-primary-500"
-                    }`}
+                        }`}
                     onClick={() => setActiveTab("catalog")}
                 >
                     Catalog
                 </button>
                 <button
-                    className={`px-4 py-2 font-semibold transition ${
-                        activeTab === "add"
+                    className={`px-4 py-2 font-semibold transition ${activeTab === "add"
                             ? "border-b-2 border-primary-500 text-primary-600"
                             : "text-gray-500 hover:text-primary-500"
-                    }`}
+                        }`}
                     onClick={() => setActiveTab("add")}
                 >
                     Add New Resource
@@ -157,13 +176,27 @@ export default function ResourceCatalog() {
                                                     {r.type}
                                                 </span>
                                             </h3>
+                                            <div className="flex items-center">
                                             <p className="text-gray-600 mt-1">Quantity: {r.quantity}</p>
+                                            <button
+                                                onClick={() => handleDelete(r._id)}
+                                                className="ml-auto  text-red-500 hover:text-red-700 transition"
+                                                title="Delete"
+                                            >
+                                                <FaTrash className="w-4 h-4" />
+                                            </button>
+                                            </div>
                                             {r.description && (
                                                 <p className="text-gray-500 mt-2 italic text-sm">
                                                     {r.description}
                                                 </p>
                                             )}
+
+
                                         </div>
+
+
+
                                     </li>
                                 ))}
                             </ul>

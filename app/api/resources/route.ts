@@ -22,6 +22,24 @@ export async function POST(req: NextRequest) {
     await connectToDatabase();
 
     const body = await req.json();
+
+    // 🧼 Handle deletion if action is 'delete'
+    if (body.action === "delete" && body.id) {
+      const deleted = await Resource.findByIdAndDelete(body.id);
+      if (!deleted) {
+        return NextResponse.json(
+          { error: "Resource not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(
+        { message: "Resource deleted successfully" },
+        { status: 200 }
+      );
+    }
+
+    // 🧼 Validate and handle resource creation
     const { name, type, quantity, description } = body;
 
     if (!name || !type || !quantity) {
@@ -41,7 +59,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(newResource, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to create resource" },
+      { error: "Failed to process request" },
       { status: 500 }
     );
   }
