@@ -49,6 +49,8 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     const [error, setError] = useState("");
     const [editingId, setEditingId] = useState<string | null>(null);
     const [bookedEvents, setBookedEvents] = useState<any[]>([]);
+    const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
+
 
 
     useEffect(() => {
@@ -66,47 +68,48 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     };
 
 
-   const fetchBookedResources = async () => {
-  const res = await fetch(`/api/events/${eventId}`);
-  const data = await res.json();
-  setBookedEvents(data.resources);
-}; 
+    const fetchBookedResources = async () => {
+        const res = await fetch(`/api/events/${eventId}`);
+        const data = await res.json();
+        setBookedEvents(data.resources);
+    };
 
-useEffect(() => {
-  fetchResources();
-  fetchBookedResources();
-}, []);
+    useEffect(() => {
+        fetchResources();
+        fetchBookedResources();
+    }, []);
 
 
 
     const handleBookResource = async (id: string) => {
-  try {
-    const res = await fetch("/api/resources", {
-      method: "POST",
-      body: JSON.stringify({ action: "book", id , userId: "user-id-placeholder", eventId }), // Replace with actual user ID
-    });
-    const data = await res.json();
+        const quantity = quantityMap[id] || 1;
+        try {
+            const res = await fetch("/api/resources", {
+                method: "POST",
+                body: JSON.stringify({ action: "book", id, quantity, userId: "user-id-placeholder", eventId }), // Replace with actual user ID
+            });
+            const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error || "Failed to book");
-    fetchResources(); // refresh list
-  } catch (err) {
-    setError((err as Error).message);
-  }
-};
+            if (!res.ok) throw new Error(data.error || "Failed to book");
+            fetchResources(); // refresh list
+        } catch (err) {
+            setError((err as Error).message);
+        }
+    };
 
-const handleUnbookResource = async (id: string) => {
-  try {
-    const res = await fetch("/api/resources", {
-      method: "POST",
-      body: JSON.stringify({ action: "unbook", id }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to unbook");
-    fetchResources(); // refresh list
-  } catch (err) {
-    setError((err as Error).message);
-  }
-};
+    const handleUnbookResource = async (id: string) => {
+        try {
+            const res = await fetch("/api/resources", {
+                method: "POST",
+                body: JSON.stringify({ action: "unbook", id }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to unbook");
+            fetchResources(); // refresh list
+        } catch (err) {
+            setError((err as Error).message);
+        }
+    };
 
 
 
@@ -171,7 +174,7 @@ const handleUnbookResource = async (id: string) => {
                                                 </h3>
 
                                                 <p className="text-gray-600 mt-1">
-                                                    
+
                                                     <span className={r.available === 0 ? "text-red-500" : "text-green-600"}>
                                                         Available: {r.available}
                                                     </span>
@@ -180,26 +183,30 @@ const handleUnbookResource = async (id: string) => {
                                                     <p className="text-gray-500 mt-2 italic text-sm">{r.description}</p>
                                                 )}
                                                 <div className="flex gap-2 mt-3 justify-end w-full">
-                                                    <div className="ml-auto flex gap-2">
-                                                        <div className="ml-auto flex gap-2">
-  {r.available > 0 ? (
-    <button
-      onClick={() => handleBookResource(r._id)}
-      className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1 rounded shadow"
-    >
-      Book
-    </button>
-  ) : (
-    <button
-      className="bg-gray-400 hover:bg-gray-500 text-white text-sm px-3 py-1 rounded shadow disabled:opacity-50"
-    >
-      Book
-    </button>
-  )}
+                                                    <div className="ml-auto flex gap-2 items-center">
+  <input
+    type="number"
+    min={1}
+    max={r.available}
+    value={quantityMap[r._id] || 1}
+    onChange={(e) => {
+      const val = Math.min(r.available, Math.max(1, parseInt(e.target.value) || 1));
+      setQuantityMap((prev) => ({ ...prev, [r._id]: val }));
+    }}
+    className="w-16 px-2 py-1 border rounded text-sm"
+  />
+
+  <button
+    onClick={() => handleBookResource(r._id)}
+    className={`text-white text-sm px-3 py-1 rounded shadow ${
+      r.available > 0 ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"
+    }`}
+    disabled={r.available === 0}
+  >
+    Book
+  </button>
 </div>
 
-                                                    
-                                                    </div>
                                                 </div>
                                             </div>
                                         </li>

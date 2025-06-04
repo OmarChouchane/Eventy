@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const userId = sessionClaims?.userId as string;
 
   console.log("userId", userId);
-  
+
 
   try {
     await connectToDatabase();
@@ -47,46 +47,51 @@ export async function POST(req: NextRequest) {
 
     // 🟢 BOOK logic
     if (body.action === "book" && body.id && body.userId && body.eventId) {
-  console.log("booking");
+      const quantity = parseInt(body.quantity, 10);
 
-  const resource = await Resource.findById(body.id);
-  if (!resource) {
-    return NextResponse.json({ error: "Resource not found" }, { status: 404 });
-  }
+      if (!quantity || quantity <= 0) {
+        return NextResponse.json({ error: "Invalid quantity" }, { status: 400 });
+      }
 
-  if (resource.available <= 0) {
-    return NextResponse.json({ error: "Resource is fully booked" }, { status: 400 });
-  }
+      const resource = await Resource.findById(body.id);
+      if (!resource) {
+        return NextResponse.json({ error: "Resource not found" }, { status: 404 });
+      }
 
-  resource.available -= 1;
-  await resource.save();
+      if (resource.available < quantity) {
+        return NextResponse.json({ error: `Only ${resource.available} available` }, { status: 400 });
+      }
 
-  // ⬇️ Create Booking entry
-  try {
-    const Booking = (await import("@/lib/database/models/booking.model")).default;
-    const newBooking = await Booking.create({
-      userId: body.userId,
-      eventId: body.eventId,
-      resources: [
-        {
-          resourceId: body.id,
-          quantity: 1,
-        }
-      ],
-    });
+      resource.available -= quantity;
+      await resource.save();
 
-    return NextResponse.json(
-      { message: "Booked successfully", booking: newBooking, resource },
-      { status: 200 }
-    );
-  } catch (err) {
-    console.error("Failed to create booking:", err);
-    return NextResponse.json(
-      { error: "Resource updated, but booking failed" },
-      { status: 500 }
-    );
-  }
-}
+      // Create a booking record
+      try {
+        const Booking = (await import("@/lib/database/models/booking.model")).default;
+        const newBooking = await Booking.create({
+          userId: body.userId,
+          eventId: body.eventId,
+          resources: [
+            {
+              resourceId: body.id,
+              quantity,
+            },
+          ],
+        });
+
+        return NextResponse.json(
+          { message: "Booked successfully", booking: newBooking, resource },
+          { status: 200 }
+        );
+      } catch (err) {
+        console.error("Failed to create booking:", err);
+        return NextResponse.json(
+          { error: "Resource updated, but booking failed" },
+          { status: 500 }
+        );
+      }
+    }
+
 
 
 
@@ -106,10 +111,10 @@ export async function POST(req: NextRequest) {
 
     // 🟡 EDIT logic
     if (body.action === "edit" && body.id) {
-      const { name, type, quantity, description } = body;
+      const { name, type, quantity, available, description } = body;
       const updated = await Resource.findByIdAndUpdate(
         body.id,
-        { name, type, quantity, description },
+        { name, type, quantity, available, description },
         { new: true }
       );
       if (!updated) {
@@ -122,10 +127,10 @@ export async function POST(req: NextRequest) {
     }
 
     // 🟢 CREATE logic (default)
-    const { name, type, quantity, description } = body;
-    if (!name || !type || !quantity) {
+    const { name, type, quantity, available, description } = body;
+    if (!name || !type || !quantity || !available) {
       return NextResponse.json(
-        { error: "Name, type, and quantity are required" },
+        { error: "Name, type, quantity, and available are required" },
         { status: 400 }
       );
     }
@@ -134,6 +139,7 @@ export async function POST(req: NextRequest) {
       name,
       type,
       quantity,
+      available,
       description,
     });
 
