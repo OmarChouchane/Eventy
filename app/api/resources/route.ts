@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
   const { sessionClaims } = await auth();
   const userId = sessionClaims?.userId as string;
 
-  console.log("userId", userId);
 
 
   try {
@@ -94,19 +93,82 @@ export async function POST(req: NextRequest) {
 
 
 
+    if (body.action === "unbook" && body.bookingId && body.quantity && body.userId) {
+  console.log("Unbooking resource with body:", body);
 
-    // 🔄 UNBOOK logic
-    if (body.action === "unbook" && body.id) {
-      const resource = await Resource.findById(body.id);
-      if (!resource) {
-        return NextResponse.json({ error: "Resource not found" }, { status: 404 });
-      }
-      if (resource.available < resource.quantity) {
-        resource.available += 1;
-        await resource.save();
-      }
-      return NextResponse.json(resource, { status: 200 });
+  const Booking = (await import("@/lib/database/models/booking.model")).default;
+  const Resource = (await import("@/lib/database/models/resource.model")).default;
+
+  try {
+    const bookingIdParts = body.bookingId.split("-");
+    const bookingId = bookingIdParts[0]; // use only the first 24-char part
+
+    if (bookingId.length !== 24) {
+      return NextResponse.json({ error: "Invalid booking ID" }, { status: 400 });
     }
+
+    const booking = await Booking.findById(bookingId);
+    console.log("Booking found:", booking);
+    if (!booking) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    const resourceId = body.resourceId; // fixed key from body.id to body.resourceId
+    const quantityToUnbook = Number(body.quantity);
+
+    if (!resourceId) {
+      return NextResponse.json({ error: "Resource ID is required" }, { status: 400 });
+    }
+    if (!quantityToUnbook || quantityToUnbook <= 0) {
+      return NextResponse.json({ error: "Quantity must be a positive number" }, { status: 400 });
+    }
+
+    const resourceEntry = booking.resources.find(
+      (r: any) => r.resourceId.toString() === resourceId
+    );
+    if (!resourceEntry) {
+      return NextResponse.json({ error: "Resource not found in booking" }, { status: 404 });
+    }
+
+    const resource = await Resource.findById(resourceId);
+    if (!resource) {
+      return NextResponse.json({ error: "Resource not found" }, { status: 404 });
+    }
+
+    const unbookQuantity = Math.min(quantityToUnbook, resourceEntry.quantity);
+
+    // Update resource availability
+    resource.available += unbookQuantity;
+    await resource.save();
+
+    // Update or remove resource in booking
+    resourceEntry.quantity -= unbookQuantity;
+    if (resourceEntry.quantity <= 0) {
+      booking.resources = booking.resources.filter(
+        (r: any) => r.resourceId.toString() !== resourceId
+      );
+    }
+
+    // If no resources left in booking, delete booking; otherwise, save updates
+    if (booking.resources.length === 0) {
+      await booking.deleteOne();
+    } else {
+      await booking.save();
+    }
+
+    return NextResponse.json(
+      { message: "Unbooked successfully", updatedResource: resource },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Error during unbooking:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+
+
+
 
 
     // 🟡 EDIT logic

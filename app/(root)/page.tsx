@@ -21,7 +21,6 @@ export default async function Home( { searchParams }: SearchParamProps ) {
     category: category
   });
 
-  console.log(events);
 
   return (
     <main>

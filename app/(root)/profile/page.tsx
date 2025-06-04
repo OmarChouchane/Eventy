@@ -18,8 +18,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
     const registeredEvents = await getUserRegistrations(userId);
     const organizedEvents = await getEventsByUser({ userId, page: eventsPage })
 
-    console.log("Registered Events:", registeredEvents);
-    console.log("Organized Events:", organizedEvents);
+
     return (
         <>
             {/* MY EVENTS */}

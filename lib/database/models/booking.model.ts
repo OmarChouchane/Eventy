@@ -1,26 +1,28 @@
-import mongoose, { Schema, Document } from "mongoose";
+import { type Document, Schema, model, models } from "mongoose";
 
 export interface IBooking extends Document {
-  userId: mongoose.Schema.Types.ObjectId;
-  eventId: mongoose.Schema.Types.ObjectId;
+  userId: Schema.Types.ObjectId;
+  eventId: Schema.Types.ObjectId;
   resources: {
-    resourceId: mongoose.Schema.Types.ObjectId;
+    resourceId: Schema.Types.ObjectId;
     quantity: number;
   }[];
   createdAt: Date;
 }
 
 const BookingSchema = new Schema<IBooking>({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  eventId: { type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true },
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  eventId: { type: Schema.Types.ObjectId, ref: "Event", required: true },
   resources: [
     {
-      resourceId: { type: mongoose.Schema.Types.ObjectId, ref: "Resource", required: true },
+      resourceId: { type: Schema.Types.ObjectId, ref: "Resource", required: true },
       quantity: { type: Number, required: true, min: 1 },
-    }
+    },
   ],
   createdAt: { type: Date, default: Date.now },
 });
 
-const Booking = mongoose.models.Booking || mongoose.model<IBooking>("Booking", BookingSchema);
+// Use models directly from mongoose import to avoid undefined access
+const Booking = models.Booking || model<IBooking>("Booking", BookingSchema);
+
 export default Booking;

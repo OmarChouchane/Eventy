@@ -15,7 +15,6 @@ export default async function EventDashboardPage({ params }: DashboardPageProps)
   const registrations = await getEventRegistrations(params.id);
     const event = await getEventById(params.id);
 
-  console.log("Event Dashboard Page", { user, event, registrations, params,  });
 
 if (!event || !event.organizer || event.organizer._id.toString() !== userId) {
   return <div>Event not found or unauthorized</div>;

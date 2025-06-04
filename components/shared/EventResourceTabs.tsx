@@ -35,7 +35,7 @@ type EventResourceTabsProps = {
 };
 
 export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
-    const [activeTab, setActiveTab] = useState<"available" | "book">("available");
+    const [activeTab, setActiveTab] = useState<"available" | "booked resources">("available");
 
 
     const [resources, setResources] = useState<Resource[]>([]);
@@ -50,34 +50,41 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [bookedEvents, setBookedEvents] = useState<any[]>([]);
     const [quantityMap, setQuantityMap] = useState<Record<string, number>>({});
-
+    const [bookedResources, setBookedResources] = useState<any[]>([]);
 
 
     useEffect(() => {
+        if (!eventId) return;
         fetchResources();
-    }, []);
+        fetchBookedResources();
+    }, [eventId]);
 
     const fetchResources = async () => {
         try {
             const res = await fetch("/api/resources");
+            if (!res.ok) throw new Error("Network response was not ok");
             const data = await res.json();
-            setResources(data);
+            setResources(data || []);
         } catch (e) {
             setError("Failed to load resources");
         }
     };
 
-
     const fetchBookedResources = async () => {
-        const res = await fetch(`/api/events/${eventId}`);
-        const data = await res.json();
-        setBookedEvents(data.resources);
+        if (!eventId) return; // Double check eventId presence
+        try {
+            const res = await fetch(`/api/events/${eventId}`);
+            if (!res.ok) throw new Error("Network response was not ok");
+            const data = await res.json();
+            setBookedResources(Array.isArray(data.resources) ? data.resources : []);
+        } catch (e) {
+            setError("Failed to load booked resources");
+        }
     };
 
-    useEffect(() => {
-        fetchResources();
-        fetchBookedResources();
-    }, []);
+
+
+
 
 
 
@@ -97,19 +104,38 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
         }
     };
 
-    const handleUnbookResource = async (id: string) => {
-        try {
-            const res = await fetch("/api/resources", {
-                method: "POST",
-                body: JSON.stringify({ action: "unbook", id }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to unbook");
-            fetchResources(); // refresh list
-        } catch (err) {
-            setError((err as Error).message);
-        }
-    };
+    const handleUnbook = async (bookingId: string, resourceId: string, quantity: number) => {
+  try {
+    const res = await fetch("/api/resources", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "unbook",
+        bookingId,
+        resourceId,
+        quantity,
+        userId: "user-id-placeholder",
+      }),
+    });
+
+    if (res.ok) {
+      setBookedResources((prev) =>
+        prev
+          .map((b) =>
+            b._id === bookingId && b.resource._id === resourceId
+              ? { ...b, quantity: b.quantity - quantity, unbookQty: 1 }
+              : b
+          )
+          .filter((b) => b.quantity > 0)
+      );
+    } else {
+      const errorData = await res.json();
+      console.error("Unbook failed:", errorData);
+    }
+  } catch (error) {
+    console.error("Unbook error:", error);
+  }
+};
+
 
 
 
@@ -125,16 +151,16 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     return (
         <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg mt-12">
             <nav className="flex mb-6 border-b">
-                {["available", "book"].map((tab) => (
+                {["available", "booked resources"].map((tab) => (
                     <button
                         key={tab}
                         className={`px-4 py-2 font-semibold transition ${activeTab === tab
                             ? "border-b-2 border-primary-500 text-primary-600"
                             : "text-gray-500 hover:text-primary-500"
                             }`}
-                        onClick={() => setActiveTab(tab as "available" | "book")}
+                        onClick={() => setActiveTab(tab as "available" | "booked resources")}
                     >
-                        {tab === "available" ? "Available Resources" : "Book a Resource"}
+                        {tab === "available" ? "Available Resources" : "Booked Resources"}
                     </button>
                 ))}
             </nav>
@@ -184,28 +210,27 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
                                                 )}
                                                 <div className="flex gap-2 mt-3 justify-end w-full">
                                                     <div className="ml-auto flex gap-2 items-center">
-  <input
-    type="number"
-    min={1}
-    max={r.available}
-    value={quantityMap[r._id] || 1}
-    onChange={(e) => {
-      const val = Math.min(r.available, Math.max(1, parseInt(e.target.value) || 1));
-      setQuantityMap((prev) => ({ ...prev, [r._id]: val }));
-    }}
-    className="w-16 px-2 py-1 border rounded text-sm"
-  />
+                                                        <input
+                                                            type="number"
+                                                            min={1}
+                                                            max={r.available}
+                                                            value={quantityMap[r._id] || 1}
+                                                            onChange={(e) => {
+                                                                const val = Math.min(r.available, Math.max(1, parseInt(e.target.value) || 1));
+                                                                setQuantityMap((prev) => ({ ...prev, [r._id]: val }));
+                                                            }}
+                                                            className="w-16 px-2 py-1 border rounded text-sm"
+                                                        />
 
-  <button
-    onClick={() => handleBookResource(r._id)}
-    className={`text-white text-sm px-3 py-1 rounded shadow ${
-      r.available > 0 ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"
-    }`}
-    disabled={r.available === 0}
-  >
-    Book
-  </button>
-</div>
+                                                        <button
+                                                            onClick={() => handleBookResource(r._id)}
+                                                            className={`text-white text-sm px-3 py-1 rounded shadow ${r.available > 0 ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"
+                                                                }`}
+                                                            disabled={r.available === 0}
+                                                        >
+                                                            Book
+                                                        </button>
+                                                    </div>
 
                                                 </div>
                                             </div>
@@ -215,17 +240,60 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
                             </div>
                         ))}
                     </div>
-                    {/* TODO: Replace with actual available resources logic */}
-                    <p className="text-gray-600">Resources available for this event will be shown here.</p>
+                    {Object.keys(groupedResources).length === 0 && (
+                        <p className="text-gray-600">No resources available.</p>
+                    )}
                 </div>
             )}
 
-            {activeTab === "book" && (
-                <div>
-                    {/* TODO: Replace with actual booking form */}
-                    <p className="text-gray-600">A form to book resources for this event will go here.</p>
+            {activeTab === "booked resources" && (
+                <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Booked Resources</h3>
+                    <table className="w-full text-sm text-left border border-gray-200 rounded-lg overflow-hidden">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="px-4 py-2">Resource</th>
+                                <th className="px-4 py-2">Quantity</th>
+                                <th className="px-4 py-2">Unbook</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {bookedResources?.map((booking) => (
+  <tr key={booking._id} className="border-t border-gray-200">
+    <td className="px-4 py-2">{booking.resource.name}</td>
+    <td className="px-4 py-2">{booking.quantity}</td>
+    <td className="px-4 py-2 flex gap-2 items-center">
+      <input
+        type="number"
+        min={1}
+        max={booking.quantity}
+        value={booking.unbookQty || 1}
+        onChange={(e) =>
+          setBookedResources((prev) =>
+            prev.map((b) =>
+              b._id === booking._id
+                ? { ...b, unbookQty: parseInt(e.target.value) }
+                : b
+            )
+          )
+        }
+        className="w-16 px-2 py-1 border rounded-md text-sm"
+      />
+      <button
+        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-sm"
+        onClick={() => handleUnbook(booking._id, booking.resource._id, booking.unbookQty || 1)}
+      >
+        Unbook
+      </button>
+    </td>
+  </tr>
+))}
+
+                        </tbody>
+                    </table>
                 </div>
             )}
+
         </div>
     );
 }

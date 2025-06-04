@@ -30,11 +30,6 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardPropsType) =>
   const userId = sessionClaims?.userId as string
   const isEventCreator = event.organizer && event.organizer._id && event.organizer._id.toString() === userId
 
-  console.log("Card Rendered", { eventId: event._id, userId, isEventCreator })
-  // For registration state & loading, we need React hooks,
-  // but since Card is async server component, we must
-  // create a client wrapper inside to use hooks.
-  // So we'll create a client inner component:
 
 
 
