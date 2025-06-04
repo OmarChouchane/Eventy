@@ -37,6 +37,7 @@ export default function ResourceCatalog() {
         name: "",
         type: "",
         quantity: 1,
+        available: 1,
         description: "",
     });
     const [loading, setLoading] = useState(false);
@@ -146,6 +147,7 @@ export default function ResourceCatalog() {
             name: resource.name,
             type: resource.type,
             quantity: resource.quantity,
+            available: resource.available,
             description: resource.description || "",
         });
         setEditingId(resource._id);
@@ -153,7 +155,7 @@ export default function ResourceCatalog() {
     };
 
     const resetForm = () => {
-        setForm({ name: "", type: "", quantity: 1, description: "" });
+        setForm({ name: "", type: "", quantity: 1, available: 1, description: "" });
         setEditingId(null);
     };
 
@@ -318,6 +320,22 @@ export default function ResourceCatalog() {
                             type="number"
                             min={1}
                             value={form.quantity}
+                            onChange={handleChange}
+                            required
+                            className="border rounded p-2 w-full"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block font-medium mb-1" htmlFor="available">
+                            Available *
+                        </label>
+                        <input
+                            id="available"
+                            name="available"
+                            type="number"
+                            min={0}
+                            value={form.available ?? ""}
                             onChange={handleChange}
                             required
                             className="border rounded p-2 w-full"
