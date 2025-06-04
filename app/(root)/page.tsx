@@ -30,8 +30,11 @@ export default async function Home( { searchParams }: SearchParamProps ) {
             <div className="flex flex-col justify-center gap-8">
               <h1 className="h1-bold">Host, Connect, Celebrate: Your Events, Our Platform</h1>
               <p className="p-regular-20 md:p-regular-24">
-                Book and learn helpful tips from 3,168+ mentors in world-class
-                companies with our global community.
+                Plan, manage, and share events effortlessly with Eventy.
+Because every event deserves to shine.
+
+
+
               </p>
               <Button size="lg" asChild className="button w-full sm:w-fit">
                 <Link href="">Explore Now</Link>
@@ -41,9 +44,9 @@ export default async function Home( { searchParams }: SearchParamProps ) {
             <Image
               src="/assets/images/hero.png"
               alt="Hero"
-              width={1000}
-              height={1000}
-              className="max-h-[70vh] object-contain object-center 2xl:max-h-[50vh]"
+              width={1500}
+              height={1500}
+              className="max-h-[70vh] mt-9 object-contain object-center 2xl:max-h-[50vh]"
               />
  
           </div>

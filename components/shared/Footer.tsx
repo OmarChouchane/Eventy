@@ -12,7 +12,7 @@ const Footer = () => {
             width={128}
             height={38}/>
         </Link>
-        <p>2025 Evently. All Rights reserved.</p>
+        <p>2025 Eventy. All Rights reserved.</p>
       </div>
       
     </footer>
