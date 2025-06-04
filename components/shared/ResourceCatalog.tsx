@@ -335,6 +335,7 @@ export default function ResourceCatalog() {
                             name="available"
                             type="number"
                             min={0}
+                            max={form.quantity}
                             value={form.available ?? ""}
                             onChange={handleChange}
                             required
