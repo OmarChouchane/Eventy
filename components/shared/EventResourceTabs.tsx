@@ -88,23 +88,27 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
 
 
 
-    const handleBookResource = async (id: string) => {
-        const quantity = quantityMap[id] || 1;
-        try {
-            const res = await fetch("/api/resources", {
-                method: "POST",
-                body: JSON.stringify({ action: "book", id, quantity, userId: "user-id-placeholder", eventId }), // Replace with actual user ID
-            });
-            const data = await res.json();
+const handleBookResource = async (id: string) => {
+  const quantity = quantityMap[id] || 1;
+  try {
+    const res = await fetch("/api/resources", {
+      method: "POST",
+      body: JSON.stringify({ action: "book", id, quantity, userId: "user-id-placeholder", eventId }),
+    });
+    const data = await res.json();
 
-            if (!res.ok) throw new Error(data.error || "Failed to book");
-            fetchResources(); // refresh list
-        } catch (err) {
-            setError((err as Error).message);
-        }
-    };
+    if (!res.ok) throw new Error(data.error || "Failed to book");
 
-    const handleUnbook = async (bookingId: string, resourceId: string, quantity: number) => {
+    // Refresh both lists from server to keep data consistent
+    await fetchResources();
+    await fetchBookedResources();
+
+  } catch (err) {
+    setError((err as Error).message);
+  }
+};
+
+const handleUnbook = async (bookingId: string, resourceId: string, quantity: number) => {
   try {
     const res = await fetch("/api/resources", {
       method: "POST",
@@ -118,15 +122,9 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     });
 
     if (res.ok) {
-      setBookedResources((prev) =>
-        prev
-          .map((b) =>
-            b._id === bookingId && b.resource._id === resourceId
-              ? { ...b, quantity: b.quantity - quantity, unbookQty: 1 }
-              : b
-          )
-          .filter((b) => b.quantity > 0)
-      );
+      // Refresh both lists from server to keep data consistent
+      await fetchResources();
+      await fetchBookedResources();
     } else {
       const errorData = await res.json();
       console.error("Unbook failed:", errorData);
@@ -135,6 +133,7 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
     console.error("Unbook error:", error);
   }
 };
+
 
 
 
@@ -259,35 +258,35 @@ export default function EventResourceTabs({ eventId }: EventResourceTabsProps) {
                         </thead>
                         <tbody>
                             {bookedResources?.map((booking) => (
-  <tr key={booking._id} className="border-t border-gray-200">
-    <td className="px-4 py-2">{booking.resource.name}</td>
-    <td className="px-4 py-2">{booking.quantity}</td>
-    <td className="px-4 py-2 flex gap-2 items-center">
-      <input
-        type="number"
-        min={1}
-        max={booking.quantity}
-        value={booking.unbookQty || 1}
-        onChange={(e) =>
-          setBookedResources((prev) =>
-            prev.map((b) =>
-              b._id === booking._id
-                ? { ...b, unbookQty: parseInt(e.target.value) }
-                : b
-            )
-          )
-        }
-        className="w-16 px-2 py-1 border rounded-md text-sm"
-      />
-      <button
-        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-sm"
-        onClick={() => handleUnbook(booking._id, booking.resource._id, booking.unbookQty || 1)}
-      >
-        Unbook
-      </button>
-    </td>
-  </tr>
-))}
+                                <tr key={booking._id} className="border-t border-gray-200">
+                                    <td className="px-4 py-2">{booking.resource.name}</td>
+                                    <td className="px-4 py-2">{booking.quantity}</td>
+                                    <td className="px-4 py-2 flex gap-2 items-center">
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            max={booking.quantity}
+                                            value={booking.unbookQty || 1}
+                                            onChange={(e) =>
+                                                setBookedResources((prev) =>
+                                                    prev.map((b) =>
+                                                        b._id === booking._id
+                                                            ? { ...b, unbookQty: parseInt(e.target.value) }
+                                                            : b
+                                                    )
+                                                )
+                                            }
+                                            className="w-16 px-2 py-1 border rounded-md text-sm"
+                                        />
+                                        <button
+                                            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-sm"
+                                            onClick={() => handleUnbook(booking._id, booking.resource._id, booking.unbookQty || 1)}
+                                        >
+                                            Unbook
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
 
                         </tbody>
                     </table>
