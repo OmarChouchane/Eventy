@@ -1,3 +1,6 @@
+// Resource actions for creating, updating, deleting, and retrieving resources
+// Used for resource management in events and admin dashboard
+
 'use server';
 
 import { connectToDatabase } from "../database";
@@ -9,10 +12,10 @@ interface DeleteResourceParams {
   path: string;
 }
 
+// Delete a resource by ID and revalidate the path
 export async function deleteResource({ resourceId, path }: DeleteResourceParams) {
   try {
     await connectToDatabase();
-
     const deleted = await Resource.findByIdAndDelete(resourceId);
     if (deleted) {
       revalidatePath(path);
@@ -23,6 +26,7 @@ export async function deleteResource({ resourceId, path }: DeleteResourceParams)
   }
 }
 
+// Update a resource by ID
 export async function updateResource({
   resourceId,
   name,
@@ -50,28 +54,28 @@ export async function updateResource({
   }
 }
 
-
+// Handle resource-related errors
 function handleError(error: unknown) {
-    if (error instanceof Error) {
-        console.error("Resource action error:", error.message);
-        throw new Error("Failed to update resource: " + error.message);
-    } else {
-        console.error("Unknown error:", error);
-        throw new Error("Failed to update resource due to an unknown error.");
-    }
+  if (error instanceof Error) {
+    console.error("Resource action error:", error.message);
+    throw new Error("Failed to update resource: " + error.message);
+  } else {
+    console.error("Unknown error:", error);
+    throw new Error("Failed to update resource due to an unknown error.");
+  }
 }
 
-
+// Get a resource by its ID
 export async function getResourceById(id: string) {
   try {
     await connectToDatabase();
     const resource = await Resource.findById(id);
     if (!resource) {
-        throw new Error("Resource not found");
-        }
-    return resource;
-    } catch (error) {
-        console.error("Get resource by ID error:", error);
-        throw new Error("Failed to fetch resource: " + (error instanceof Error ? error.message : "Unknown error"));
+      throw new Error("Resource not found");
     }
+    return resource;
+  } catch (error) {
+    console.error("Get resource by ID error:", error);
+    throw new Error("Failed to fetch resource: " + (error instanceof Error ? error.message : "Unknown error"));
+  }
 }

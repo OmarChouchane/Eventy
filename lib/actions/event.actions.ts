@@ -1,7 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+// Event actions for managing event creation, retrieval, update, and deletion
+// Includes event population, category lookup, and event queries by user or category
 
+import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "@/lib/database";
 import Event from "@/lib/database/models/event.model";
 import User from "@/lib/database/models/user.model";
@@ -18,10 +20,12 @@ import type {
 import type { IEvent } from "@/lib/database/models/event.model";
 import type { HydratedDocument, QueryWithHelpers } from "mongoose";
 
+// Helper to find a category by name (case-insensitive)
 const getCategoryByName = async (name: string) => {
   return Category.findOne({ name: { $regex: name, $options: "i" } });
 };
 
+// Helper to populate event with organizer and category details
 const populateEvent = (
   query: QueryWithHelpers<
     HydratedDocument<IEvent>[],
@@ -37,8 +41,7 @@ const populateEvent = (
     .populate({ path: "category", model: Category, select: "_id name" });
 };
 
-
-// CREATE
+// CREATE: Create a new event
 export async function createEvent({ userId, event, path }: CreateEventParams) {
   try {
     await connectToDatabase();
@@ -59,7 +62,7 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
   }
 }
 
-// GET ONE EVENT BY ID
+// GET ONE: Get a single event by ID
 export async function getEventById(eventId: string) {
   try {
     await connectToDatabase();
@@ -82,7 +85,7 @@ export async function getEventById(eventId: string) {
   }
 }
 
-// UPDATE
+// UPDATE: Update an event by ID and user
 export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   try {
     await connectToDatabase();
@@ -105,7 +108,7 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   }
 }
 
-// DELETE
+// DELETE: Delete an event by ID
 export async function deleteEvent({ eventId, path }: DeleteEventParams) {
   try {
     await connectToDatabase();
@@ -117,7 +120,7 @@ export async function deleteEvent({ eventId, path }: DeleteEventParams) {
   }
 }
 
-// GET ALL EVENTS
+// GET ALL: Get all events with optional search, pagination, and category filter
 export async function getAllEvents({
   query,
   limit = 6,
@@ -158,7 +161,7 @@ export async function getAllEvents({
   }
 }
 
-// GET EVENTS BY ORGANIZER
+// GET BY ORGANIZER: Get events created by a specific user
 export async function getEventsByUser({
   userId,
   limit = 6,
@@ -187,7 +190,7 @@ export async function getEventsByUser({
   }
 }
 
-// GET RELATED EVENTS: EVENTS WITH SAME CATEGORY
+// GET RELATED: Get related events by category, excluding a specific event
 export async function getRelatedEventsByCategory({
   categoryId,
   eventId,
@@ -217,8 +220,6 @@ export async function getRelatedEventsByCategory({
   } catch (error) {
     handleError(error);
   }
-
-
 }
 
 
