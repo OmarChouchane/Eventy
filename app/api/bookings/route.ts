@@ -21,14 +21,14 @@ export async function GET(_request: NextRequest) {
                     const eventObjectId = new ObjectId(booking.eventId.toString());
 
                     if (!mongoose.Types.ObjectId.isValid(booking.eventId)) {
-  console.warn("Invalid eventId in booking:", booking._id);
-  return null;
-}
+                        console.warn("Invalid eventId in booking:", booking._id);
+                        return null;
+                    }
 
-const [resource, event] = await Promise.all([
-  Resource.findById(res.resourceId),
-  Event.findById(eventObjectId),
-]);
+                    const [resource, event] = await Promise.all([
+                        Resource.findById(res.resourceId),
+                        Event.findById(eventObjectId),
+                    ]);
 
 
                     console.log("Resource:", resource);
