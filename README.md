@@ -137,7 +137,7 @@ Eventy is licensed under the MIT License. See the [LICENSE](LICENSE) file for de
 
 ## 📞 Contact
 
-Created with ❤️ by Your Name  
+Created with ❤️ by Chouchane Omar  
 Feel free to reach out for questions, feedback, or collaboration!
 
 ---
@@ -145,8 +145,3 @@ Feel free to reach out for questions, feedback, or collaboration!
 ✨ **Thanks for checking out Eventy — happy event managing!** 🎉
 
 ---
-
-> _Note: The "Tech Stack" emoji has been updated to 🛠️ for clarity. Formatting and code blocks have been improved for readability._
-```
-
-Let me know if you want to include a "🛠️ Tech Stack" section as well, or anything else!
