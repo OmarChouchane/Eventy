@@ -179,8 +179,8 @@ export default function ResourceCatalog() {
     }, {});
 
     return (
-        <div>
-        <div className="flex flex-col items-center my-10">
+        <div className=" bg-gray-50 bg-dotted-pattern">
+        <div className="flex flex-col items-center py-10">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-lg mb-2">
             Admin Dashboard
             </h1>
