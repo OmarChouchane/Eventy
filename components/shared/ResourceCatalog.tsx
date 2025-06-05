@@ -44,7 +44,7 @@ export default function ResourceCatalog() {
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState<"catalog" | "add" | "bookings">("catalog");
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [bookedEvents, setBookedEvents] = useState<any[]>([]);
+    const [bookedEvents, setBookedEvents] = useState<Record<string, any[]>>({});
 
 
     useEffect(() => {
@@ -57,14 +57,27 @@ export default function ResourceCatalog() {
     }, [activeTab]);
 
     const fetchBookings = async () => {
-        try {
-            const res = await fetch("/api/bookings");
-            const data = await res.json();
-            setBookedEvents(data);
-        } catch (e) {
-            console.error("Error loading bookings");
-        }
-    };
+    try {
+        const res = await fetch("/api/bookings");
+        const data = await res.json();
+        console.log("Fetched bookings:", data);
+
+        // Group by eventId
+        const groupedByEvent: Record<string, any[]> = {};
+        data.resources.forEach((item: any) => {
+            const eventId = item.eventId;
+            if (!groupedByEvent[eventId]) {
+                groupedByEvent[eventId] = [];
+            }
+            groupedByEvent[eventId].push(item);
+        });
+
+        setBookedEvents(groupedByEvent); // now your state is grouped by eventId
+    } catch (e) {
+        console.error("Error loading bookings", e);
+    }
+};
+
 
     const fetchResources = async () => {
         try {
@@ -238,13 +251,13 @@ export default function ResourceCatalog() {
                                                     {r.type}
                                                 </span>
                                             </h3>
-                                            
+
                                             <p className="text-gray-600 mt-1">
-  Quantity: {r.quantity} {" | "} 
-  <span className={r.available === 0 ? "text-red-500" : "text-green-600"}>
-    Available: {r.available}
-  </span>
-</p>
+                                                Quantity: {r.quantity} {" | "}
+                                                <span className={r.available === 0 ? "text-red-500" : "text-green-600"}>
+                                                    Available: {r.available}
+                                                </span>
+                                            </p>
                                             {r.description && (
                                                 <p className="text-gray-500 mt-2 italic text-sm">{r.description}</p>
                                             )}
@@ -369,40 +382,48 @@ export default function ResourceCatalog() {
                 </form>
             )}
 
-            {activeTab === "bookings" && (
-                <div>
-                    {bookedEvents.length === 0 ? (
-                        <p className="text-center text-gray-500 py-8">No bookings found.</p>
-                    ) : (
-                        bookedEvents.map((booking) => (
-                            <div key={booking.event._id} className="mb-8 border rounded-lg p-4 shadow">
-                                <h3 className="text-xl font-bold text-primary-700 mb-2">{booking.event.title}</h3>
-                                <p className="text-sm text-gray-600 mb-4">
-                                    Date: {new Date(booking.event.date).toLocaleString()}
-                                </p>
-
-                                <ul className="space-y-2">
-                                    {booking.resources.map((item: any, idx: number) => (
-                                        <li
-                                            key={idx}
-                                            className="flex items-center justify-between bg-gray-50 p-3 rounded"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                {getResourceIcon(item.resource.type)}
-                                                <span className="font-medium">{item.resource.name}</span>
-                                                <span className="text-sm text-gray-500">({item.resource.type})</span>
-                                            </div>
-                                            <span className="text-sm font-semibold text-gray-700">
-                                                x {item.quantity}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))
-                    )}
+{activeTab === "bookings" && (
+    <div>
+        {Object.keys(bookedEvents).length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No bookings found.</p>
+        ) : (
+            Object.entries(bookedEvents).map(([eventId, resources]) => (
+                <div key={eventId} className="mb-10">
+                    <h2 className="text-xl font-bold mb-3 text-indigo-700 flex items-center gap-2">
+                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold">
+                            Event title: {resources[0]?.eventTitle || "Unknown"}
+                        </span>
+                    </h2>
+                    <div className="overflow-x-auto rounded-lg shadow">
+                        <table className="min-w-full bg-white border border-gray-200">
+                            <thead>
+                                <tr className="bg-gray-100 text-gray-700">
+                                    <th className="px-4 py-2 text-left font-semibold">Resource</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Type</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Quantity Booked</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {resources.map((res) => (
+                                    <tr key={res._id} className="border-t hover:bg-gray-50">
+                                        <td className="px-4 py-2 flex items-center gap-2">
+                                            {getResourceIcon(res.resource.type)}
+                                            <span className="font-medium">{res.resource.name}</span>
+                                        </td>
+                                        <td className="px-4 py-2 capitalize">{res.resource.type}</td>
+                                        <td className="px-4 py-2">{res.quantity}</td>
+                                        <td className="px-4 py-2 text-gray-500">{res.resource.description || "-"}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            )}
+            ))
+        )}
+    </div>
+)}
 
         </div>
     );
