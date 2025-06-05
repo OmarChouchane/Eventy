@@ -179,7 +179,17 @@ export default function ResourceCatalog() {
     }, {});
 
     return (
+        <div>
+        <div className="flex flex-col items-center my-10">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-lg mb-2">
+            Admin Dashboard
+            </h1>
+            <p className="text-lg text-gray-500 font-medium">
+            Manage resources, bookings, and more
+            </p>
+        </div>
         <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+            
             <nav className="flex mb-6 border-b">
                 <button
                     className={`px-4 py-2 font-semibold transition ${activeTab === "catalog"
@@ -426,5 +436,7 @@ export default function ResourceCatalog() {
 )}
 
         </div>
+        </div>
     );
+    
 }
