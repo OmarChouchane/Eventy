@@ -1,10 +1,10 @@
-# Eventy 🎉
+# Eventy
 
 **Eventy** is a sleek and modern event management web app designed to help you host, connect, and celebrate events effortlessly. Whether you're organizing a conference, meetup, or party, Eventy provides everything you need to manage your events and attendees with ease.
 
 ---
 
-## 🚀 Features
+## Features
 
 - **User Authentication:** Secure sign-up and login with modern authentication.
 - **Event Creation & Management:** Create, edit, and delete events with rich details.
@@ -28,7 +28,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend:** Next.js, React, Tailwind CSS, Shadcn UI
 - **Backend:** Node.js, Next.js API Routes
@@ -40,7 +40,7 @@
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 git clone https://github.com/yourusername/eventy.git
@@ -52,7 +52,7 @@ npm run dev
 
 ```
 
-## 🚀 Deployment
+## Deployment
 
 You can deploy Eventy easily on platforms like Vercel or Netlify.
 
@@ -73,7 +73,7 @@ git push origin main
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Run tests locally with:
 
@@ -83,7 +83,7 @@ npm run test
 
 ---
 
-## 📅 Roadmap
+## Roadmap
 
 - Add calendar sync with Google and Outlook
 - SMS notifications for event reminders
@@ -93,7 +93,7 @@ npm run test
 
 ---
 
-## ❓ FAQ
+## FAQ
 
 **Q: Can I use Eventy for free?**  
 A: Yes! Eventy is open-source and free to use.
@@ -106,7 +106,7 @@ A: Yes, organizers can export participant data as CSV files.
 
 ---
 
-## 🙌 Contributing
+## Contributing
 
 Contributions are welcome! To contribute:
 
@@ -129,13 +129,7 @@ Please follow the Code of Conduct and Contributing Guidelines.
 
 ---
 
-## 📄 License
-
-Eventy is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-## 📞 Contact
+## Contact
 
 Created with ❤️ by Chouchane Omar  
 Feel free to reach out for questions, feedback, or collaboration!
