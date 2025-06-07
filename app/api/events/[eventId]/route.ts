@@ -1,6 +1,6 @@
 // app/api/events/[eventId]/route.ts
 
-export const runtime = "nodejs"; // ✅ MUST be first
+export const runtime = "nodejs"; 
 
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database";
