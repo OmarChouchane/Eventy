@@ -16,15 +16,7 @@
 
 ---
 
-
-### Eventy Home
-
-![localhost_3000_ (4)](https://github.com/user-attachments/assets/a91f6852-6d85-4979-88fa-135e8c1ab4d3)
-
----
-
-### Eventy Admin Dashboard
-![localhost_3000_dashboard_resources](https://github.com/user-attachments/assets/4c844d55-4034-47d7-b519-d55b2bf1dd57)
+![eventy_ui](https://github.com/user-attachments/assets/64018b1c-58ad-4d39-8fa3-cdc4103a7c99)
 
 ---
 
