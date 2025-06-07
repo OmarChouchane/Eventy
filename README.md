@@ -19,8 +19,7 @@
 
 ### Eventy Home
 
-![localhost_3000_ (3)](https://github.com/user-attachments/assets/5d07c7f4-f5d1-459d-9d81-be1e5775a5dc)
-
+![localhost_3000_ (4)](https://github.com/user-attachments/assets/a91f6852-6d85-4979-88fa-135e8c1ab4d3)
 
 ---
 
