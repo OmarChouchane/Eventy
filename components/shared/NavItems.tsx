@@ -14,14 +14,13 @@ export const NavItems = () => {
       {headerLinks.map((link) => {
         const isActive = pathname === link.route;
         return (
-          <li
+            <li
             key={link.route}
             className={cn(
-              "flex-center p-medium-16 whitespace-nowrap",
-              isActive && "text-primary-500",
-              !isActive && "text-gray-500 hover:text-primary-500"
+              "flex-center p-medium-16 whitespace-nowrap transition-colors duration-300 ease-in-out",
+              isActive ? "text-primary-500" : "text-white hover:text-primary-500"
             )}
-          >
+            >
             <Link href={link.route}>{link.label}</Link>
           </li>
         );
