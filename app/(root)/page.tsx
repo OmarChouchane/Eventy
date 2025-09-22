@@ -114,7 +114,14 @@ export default async function Home({ searchParams }: SearchParamProps) {
             <Button
               size="lg"
               asChild
-              className="button mt-8 w-full sm:w-fit text-black bg-white hover:border-white/40  hover:backdrop-blur-xl shadow-sm border hover:bg-white/5 hover:text-white border-transparent "
+              className="button mt-8 w-full sm:w-fit text-black bg-white hover:border-white/40 hover:backdrop-blur-xl shadow-sm border hover:bg-white/5 hover:text-white border-transparent
+              relative overflow-hidden
+              before:content-[''] before:absolute before:inset-0 before:rounded-lg
+              before:bg-white before:opacity-5 before:blur-[18px] before:animate-pulse
+              "
+              style={{
+              boxShadow: "0 0 16px 2px #fff6, 0 0 32px 4px #38bdf866",
+              }}
             >
               <Link href="#events">Explore Now</Link>
             </Button>
