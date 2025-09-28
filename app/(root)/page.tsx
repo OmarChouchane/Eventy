@@ -137,7 +137,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
           </h2>
           <div
             style={{
-              height: "200px",
+              height: "130px",
               position: "relative",
               overflow: "hidden",
             }} 
@@ -159,7 +159,8 @@ export default async function Home({ searchParams }: SearchParamProps) {
         </div>
 
         {/* Search and Category Filter */}
-        <div className="wrapper my-8 flex flex-col gap-8 md:gap-12">
+        <div className="h-full bg-black bg-gradient-to-b from-black via-gray-900 to-black bg-contain py-5 md:py-10">
+        <div className="wrapper flex flex-col gap-8 md:gap-12">
           <div className="flex w-full flex-col gap-5 md:flex-row">
             <Search />
             <CategoryFilter />
@@ -179,6 +180,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
             }
             total={events?.totalPages || 0}
           />
+        </div>
         </div>
       </section>
     </main>
