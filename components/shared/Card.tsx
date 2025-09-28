@@ -68,7 +68,7 @@ const Card = async ({
 
       <div className="flex min-h-[138px] flex-col gap-3 p-5 md:gap-4">
         <div className="flex gap-2 items-center">
-          <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-600">
+          <span className="p-semibold-14 w-min rounded-full bg-blue-900 px-4 py-1 text-gray-300">
             {event.isFree ? "FREE" : `$${event.price}`}
           </span>
           <p className="p-semibold-14 w-min rounded-full bg-gray-500/10 px-4 py-1 text-gray-500 line-clamp-1">
@@ -88,29 +88,29 @@ const Card = async ({
           )}
         </div>
         {event.location && (
-          <div className="flex items-center gap-2">
-            <Image
-              src="/assets/icons/location.svg"
+            <div className="flex items-center gap-2">
+            <span className="p-semibold-14 w-min rounded-full bg-gray-800/50 px-2 pr-8 py-1 text-blue-700 whitespace-nowrap flex items-center gap-1">
+              <Image
+              src="/assets/icons/location-grey.svg"
               alt="location"
               width={16}
               height={16}
-            />
-            <span className="p-semibold-14 w-min rounded-full bg-blue-100 px-4 py-1 text-blue-600 whitespace-nowrap">
-              {event.location}
+              />
+              <span className="pl-1">{event.location}</span>
             </span>
-          </div>
+            </div>
         )}{" "}
         <p className="p-medium-16 p-medium-18 text-gray-500">
           {formatDateTime(event.startDateTime).dateTime}
         </p>
         <Link
           href={`/events/${event._id}`}
-          className="p-medium016 md:p-medium-20 line-clamp-2 flex-1 text-black text-2xl font-bold"
+          className="p-medium016 md:p-medium-20 line-clamp-2 flex-1 text-white text-2xl font-bold"
         >
           {event.title}
         </Link>
         <div className="flex-between w-full">
-          <p className="p-medium-14 md:p-medium-16 text-gray-600">
+          <p className="p-medium-14 md:p-medium-16 text-gray-400">
             {event.organizer
               ? `${event.organizer.firstName} ${event.organizer.lastName}`
               : "Unknown Organizer"}
