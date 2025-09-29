@@ -32,7 +32,7 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardProps) => {
           className="pointer-events-none absolute inset-0 z-0 rounded-xl"
           style={{
             backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px)",
+              "radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px)",
             backgroundSize: "16px 16px",
             backgroundPosition: "0 0, 8px 8px",
           }}
