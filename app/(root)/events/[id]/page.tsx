@@ -12,6 +12,11 @@ import { auth } from "@clerk/nextjs/server";
 import Header from "@/components/shared/Header";
 import EventResourceTabs from "@/components/shared/EventResourceTabs";
 import { getEventRegistrations } from "@/lib/actions/registration.actions";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getEventsByUser } from "@/lib/actions/event.actions";
+import type { IEvent } from "@/lib/database/models/event.model";
+export const dynamic = "force-dynamic";
 
 // Minimal user shape for attendee avatars
 type AttendeeUser = {
@@ -29,26 +34,89 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   // const { page = '1' } = resolvedSearchParams; // not needed, using resolvedSearchParams.page directly
 
   const event = await getEventById(id);
+  if (!event) return notFound();
 
   const { sessionClaims } = await auth();
 
   const userId = sessionClaims?.userId as string;
 
-  const isOrganizer = userId === event.organizer._id;
+  const organizerMaybe = event.organizer as { _id: string } | null | undefined;
+  const organizerId = organizerMaybe?._id;
+  const isOrganizer = !!(
+    userId &&
+    organizerId &&
+    String(organizerId) === String(userId)
+  );
 
-  const relatedEvents = await getRelatedEventsByCategory({
-    categoryId: event.category._id,
-    eventId: event._id,
-    page: resolvedSearchParams.page as string,
-  });
+  const categoryMaybe = event.category as { _id: string } | null | undefined;
+  const relatedPageParam = Array.isArray(resolvedSearchParams?.page)
+    ? resolvedSearchParams.page[0] || "1"
+    : resolvedSearchParams?.page || "1";
+  let relatedEvents: { data: IEvent[]; totalPages: number } = {
+    data: [],
+    totalPages: 0,
+  };
+  if (categoryMaybe?._id) {
+    try {
+      const rel = await getRelatedEventsByCategory({
+        categoryId: categoryMaybe._id,
+        eventId: event._id,
+        page: relatedPageParam,
+      });
+      if (rel) {
+        relatedEvents = {
+          data: (rel.data as IEvent[]) || [],
+          totalPages: rel.totalPages || 0,
+        };
+      }
+    } catch {
+      // Swallow and fallback to empty related events on transient backend errors
+      relatedEvents = { data: [], totalPages: 0 };
+    }
+  }
 
   // Fetch registrations for attendee count and avatars
-  const registrations = await getEventRegistrations(event._id);
-  const attendees: AttendeeUser[] = (
-    Array.isArray(registrations) ? registrations : []
-  )
-    .map((r: { user?: AttendeeUser }) => r.user)
+  type RegistrationLite = { user?: AttendeeUser };
+  let registrations: RegistrationLite[] = [];
+  try {
+    const reg = (await getEventRegistrations(event._id)) as RegistrationLite[];
+    registrations = Array.isArray(reg) ? reg : [];
+  } catch {
+    registrations = [];
+  }
+  const attendees: AttendeeUser[] = registrations
+    .map((r) => r.user)
     .filter((u): u is AttendeeUser => !!u);
+
+  // Organizer's other events (visible to all; based on current event's organizer)
+  let organizerEvents: { data: IEvent[]; totalPages: number } | null = null;
+  let organizerEventsFiltered: IEvent[] = [];
+  let organizerEventsPage: number | string = 1;
+  if (organizerId) {
+    const orgPageRaw = resolvedSearchParams?.["org_page"];
+    organizerEventsPage = Array.isArray(orgPageRaw)
+      ? orgPageRaw[0] || 1
+      : orgPageRaw || 1;
+    const pageNum = Number(organizerEventsPage) || 1;
+    try {
+      const orgRes = await getEventsByUser({
+        userId: String(organizerId),
+        limit: 6,
+        page: pageNum,
+      });
+      organizerEvents = orgRes
+        ? {
+            data: (orgRes.data as IEvent[]) || [],
+            totalPages: orgRes.totalPages || 0,
+          }
+        : { data: [], totalPages: 0 };
+    } catch {
+      organizerEvents = { data: [], totalPages: 0 };
+    }
+    organizerEventsFiltered = (organizerEvents?.data || []).filter(
+      (e: IEvent) => String(e._id) !== String(event._id)
+    );
+  }
 
   return (
     <main className="bg-black min-h-screen">
@@ -78,7 +146,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
 
             <div className="flex flex-wrap items-center gap-3">
               <span className="p-bold-14 rounded-full bg-blue-600/20 text-blue-300 border border-blue-400/20 px-4 py-1">
-                {event.category.name}
+                {event.category?.name || "General"}
               </span>
               <span className="p-bold-14 rounded-full bg-emerald-600/20 text-emerald-300 border border-emerald-400/20 px-4 py-1">
                 {event.isFree ? "FREE" : `$${event.price}`}
@@ -86,7 +154,8 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
               <span className="p-medium-16 ml-1 text-gray-300">
                 by{" "}
                 <span className="text-orange-400">
-                  {event.organizer.firstName} {event.organizer.lastName}
+                  {event.organizer?.firstName || "Unknown"}{" "}
+                  {event.organizer?.lastName || "Organizer"}
                 </span>
               </span>
             </div>
@@ -154,7 +223,9 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
                   width={24}
                   height={24}
                 />
-                <p className="p-medium-16 lg:p-regular-20">{event.location}</p>
+                <p className="p-medium-16 lg:p-regular-20">
+                  {event.location || "Location TBA"}
+                </p>
               </div>
             </div>
 
@@ -185,17 +256,28 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
                 </span>
               </div>
 
-              <CheckoutButton event={event} />
+              {/* CTA: Checkout for attendees, Dashboard for organizer */}
+              {isOrganizer ? (
+                <Link
+                  href={`/dashboard/events/${event._id}`}
+                  className="inline-flex items-center justify-center w-full rounded-lg bg-orange-600 text-white py-2.5 px-4 font-semibold hover:bg-orange-500 transition"
+                >
+                  Open Dashboard
+                </Link>
+              ) : (
+                <CheckoutButton event={event} />
+              )}
 
               <div className="h-px bg-white/10" />
               <div className="space-y-2 text-sm text-gray-300">
                 <p>
                   <span className="text-gray-400">Organizer:</span>{" "}
-                  {event.organizer.firstName} {event.organizer.lastName}
+                  {event.organizer?.firstName || "Unknown"}{" "}
+                  {event.organizer?.lastName || "Organizer"}
                 </p>
                 <p>
                   <span className="text-gray-400">Category:</span>{" "}
-                  {event.category.name}
+                  {event.category?.name || "General"}
                 </p>
                 <p>
                   <span className="text-gray-400">Starts:</span>{" "}
@@ -212,17 +294,37 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
       </section>
 
       {/* Organizer resources (only for organizer) */}
-      {isOrganizer && (
+      {/*isOrganizer && (
         <section className="bg-gradient-to-b from-black via-gray-900 to-black text-white py-6">
           <div className="wrapper">
             <EventResourceTabs eventId={event._id} />
           </div>
         </section>
-      )}
+      )}*/}
 
       {/* Related events */}
       <section className="bg-gradient-to-b from-black via-gray-900 to-black text-white py-10">
         <div className="wrapper flex flex-col gap-8 md:gap-12">
+          {organizerEvents && (
+            <>
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Organized by {event.organizer?.firstName || "Unknown"}{" "}
+                {event.organizer?.lastName || "Organizer"}
+              </h2>
+              <Collection
+                data={organizerEventsFiltered}
+                emptyTitle="No Events Yet"
+                emptyStateSubtext="Create your first event"
+                collectionType="All_Events"
+                limit={6}
+                page={organizerEventsPage}
+                total={organizerEvents?.totalPages || 0}
+                urlParamName="org_page"
+              />
+              <div className="h-px bg-white/10" />
+            </>
+          )}
+
           <h2 className="text-2xl md:text-3xl font-bold">Related Events</h2>
           <Collection
             data={relatedEvents?.data}

@@ -1,6 +1,16 @@
 import sgMail from "@sendgrid/mail";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL;
+
+// Only set the API key if present to avoid throwing on import
+if (SENDGRID_API_KEY) {
+  try {
+    sgMail.setApiKey(SENDGRID_API_KEY);
+  } catch (e) {
+    console.warn("Failed to set SendGrid API key:", e);
+  }
+}
 
 interface ConfirmationEmailParams {
   to: string;
@@ -14,10 +24,18 @@ interface ConfirmationEmailParams {
   };
 }
 
-export const sendConfirmationEmail = async ({ to, event }: ConfirmationEmailParams) => {
-const msg = {
+export const sendConfirmationEmail = async ({
+  to,
+  event,
+}: ConfirmationEmailParams) => {
+  // If env vars are missing, skip sending gracefully
+  if (!SENDGRID_API_KEY || !SENDGRID_FROM_EMAIL) {
+    console.warn("sendConfirmationEmail skipped: missing SENDGRID credentials");
+    return;
+  }
+  const msg = {
     to,
-    from: process.env.SENDGRID_FROM_EMAIL!,
+    from: SENDGRID_FROM_EMAIL,
     subject: `You're Registered for "${event.title}" 🎉`,
     html: `
         <head>
@@ -46,25 +64,28 @@ const msg = {
                     <p><strong>Starts:</strong> ${event.startDateTime}</p>
                     <p><strong>Ends:</strong> ${event.endDateTime}</p>
                     ${
-                        event.imageUrl
-                            ? `<img src="${event.imageUrl}" alt="Event Image" style="max-width:100%; border-radius: 6px; margin-top: 20px;" />`
-                            : ""
+                      event.imageUrl
+                        ? `<img src="${event.imageUrl}" alt="Event Image" style="max-width:100%; border-radius: 6px; margin-top: 20px;" />`
+                        : ""
                     }
                     <p>We're excited to see you there!</p>
                 </div>
                 <div class="footer">
-                    You received this email because you registered for ${event.title}.
+                    You received this email because you registered for ${
+                      event.title
+                    }.
                 </div>
             </div>
         </body>
     `,
-};
+  };
 
   try {
     await sgMail.send(msg);
     console.log("Confirmation email sent to", to);
-  } catch (error: any) {
-    console.error("SendGrid email error:", error.response?.body || error.message);
-    throw new Error("Failed to send confirmation email");
+  } catch (error: unknown) {
+    const err = error as { response?: { body?: unknown }; message?: string };
+    console.error("SendGrid email error:", err.response?.body || err.message);
+    // Do not throw to avoid breaking user flow
   }
 };
