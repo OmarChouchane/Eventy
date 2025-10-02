@@ -1,4 +1,4 @@
-import { NextConfig } from 'next';
+import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
@@ -6,6 +6,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "wxuvdw0gh5.ufs.sh",
+        port: "",
+        search: "",
+      },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+        port: "",
+        search: "",
+      },
+      {
+        protocol: "https",
+        hostname: "images.clerk.dev",
         port: "",
         search: "",
       },
