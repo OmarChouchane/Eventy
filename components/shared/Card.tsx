@@ -26,7 +26,7 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardProps) => {
 
   return (
     <CardContainer className="inter-var flex-shrink-0 w-[320px] sm:w-[360px] lg:w-[400px]">
-      <CardBody className="bg-black relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full min-h-[380px] md:min-h-[438px] rounded-xl border flex flex-col overflow-visible shadow-md transition-all hover:shadow-lg">
+      <CardBody className="bg-black relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full min-h-[380px] md:min-h-[438px] rounded-xl border flex flex-col overflow-visible shadow-md transition-all hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-400/20">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 z-0 rounded-xl"
@@ -41,7 +41,7 @@ const Card = async ({ event, hasOrderLink = true, hidePrice }: CardProps) => {
           <Link
             href={`/events/${event._id}`}
             tabIndex={-1}
-            className="block w-full h-full relative group"
+            className="block w-[400px] h-[200px] relative group"
           >
             <Image
               src={event.imageUrl}

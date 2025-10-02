@@ -11,6 +11,7 @@ import Header from "@/components/shared/Header";
 import BlurText from "@/components/BlurText";
 import Particles from "@/components/Particles";
 import LogoLoop from "@/components/LogoLoop";
+import DarkVeil from "@/components/DarkVeil";
 
 import {
   SiReact,
@@ -140,7 +141,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
               height: "130px",
               position: "relative",
               overflow: "hidden",
-            }} 
+            }}
             className="pt-5"
           >
             <LogoLoop
@@ -158,29 +159,57 @@ export default async function Home({ searchParams }: SearchParamProps) {
           </div>
         </div>
 
-        {/* Search and Category Filter */}
-        <div className="h-full bg-black bg-gradient-to-b from-black via-gray-900 to-black bg-contain py-5 md:py-10">
-        <div className="wrapper flex flex-col gap-8 md:gap-12">
-          <div className="flex w-full flex-col gap-5 md:flex-row">
-            <Search />
-            <CategoryFilter />
+        {/* Search and Category Filter with DarkVeil Background */}
+        <div
+          className="h-full bg-black bg-gradient-to-b from-black via-gray-900 to-black bg-contain py-5 md:py-10"
+          style={{ position: "relative", overflow: "hidden" }}
+        >
+          {/* DarkVeil as full-screen background */}
+          <div
+            className="absolute inset-0 w-full h-full"
+            style={{
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <DarkVeil />
           </div>
 
-          {/* Events Collection */}
-          <Collection
-            data={events?.data}
-            emptyTitle="No Events Found"
-            emptyStateSubtext="Come back later"
-            collectionType="All_Events"
-            limit={3}
-            page={
-              Array.isArray(resolvedSearchParams?.page)
-                ? resolvedSearchParams.page[0] || 1
-                : resolvedSearchParams?.page || 1
-            }
-            total={events?.totalPages || 0}
+          {/* Top transition gradient: blends from black (previous section) into the DarkVeil */}
+          <div
+            className="absolute inset-x-0 top-0 pointer-events-none"
+            style={{
+              height: "140px",
+              zIndex: 1,
+              background:
+                "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%)",
+            }}
           />
-        </div>
+
+          <div
+            className="wrapper flex flex-col gap-8 md:gap-12"
+            style={{ position: "relative", zIndex: 2 }}
+          >
+            <div className="flex w-full flex-col gap-5 md:flex-row">
+              <Search />
+              <CategoryFilter />
+            </div>
+
+            {/* Events Collection */}
+            <Collection
+              data={events?.data}
+              emptyTitle="No Events Found"
+              emptyStateSubtext="Come back later"
+              collectionType="All_Events"
+              limit={3}
+              page={
+                Array.isArray(resolvedSearchParams?.page)
+                  ? resolvedSearchParams.page[0] || 1
+                  : resolvedSearchParams?.page || 1
+              }
+              total={events?.totalPages || 0}
+            />
+          </div>
         </div>
       </section>
     </main>
