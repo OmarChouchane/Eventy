@@ -5,7 +5,7 @@ import Header from "@/components/shared/Header";
 import { Button } from "@/components/ui/button";
 import { Collection } from "@/components/shared/Collection";
 import { auth } from "@clerk/nextjs/server";
-import { SearchParamProps } from "@/types";
+import { SearchParamProps, UserType } from "@/types";
 import { getEventsByUser } from "@/lib/actions/event.actions";
 import { getUserRegistrations } from "@/lib/actions/registration.actions";
 import { getUserById } from "@/lib/actions/user.actions";
@@ -30,6 +30,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
     lastName?: string;
     username?: string;
     photo?: string;
+    type?: UserType;
   } | null;
   let user: IUserLite = null;
   try {
@@ -134,31 +135,33 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
         </div>
       </section>
 
-      {/* Organized Events */}
-      <section className="bg-gradient-to-b from-black via-gray-900 to-black text-white py-8 md:py-10">
-        <div className="wrapper flex items-center justify-between gap-4">
-          <h3 className="text-xl md:text-2xl font-bold">Events Organized</h3>
-          <Button asChild size="lg" className="hidden sm:inline-flex">
-            <Link href="/events/create">Create New Event</Link>
-          </Button>
-        </div>
-        <div className="wrapper mt-6">
-          <Collection
-            data={organizedEvents?.data || []}
-            emptyTitle="No Events In My Collection"
-            emptyStateSubtext="No worries! You can explore more events by clicking the button above."
-            collectionType="Events_Organized"
-            limit={6}
-            page={
-              Array.isArray(orgPageRaw)
-                ? orgPageRaw[0] || "1"
-                : (orgPageRaw as string) || "1"
-            }
-            urlParamName="eventsPage"
-            total={organizedEvents?.totalPages || 0}
-          />
-        </div>
-      </section>
+      {/* Organized Events (visible only for club users) */}
+      {user?.type === "club" && (
+        <section className="bg-gradient-to-b from-black via-gray-900 to-black text-white py-8 md:py-10">
+          <div className="wrapper flex items-center justify-between gap-4">
+            <h3 className="text-xl md:text-2xl font-bold">Events Organized</h3>
+            <Button asChild size="lg" className="hidden sm:inline-flex">
+              <Link href="/events/create">Create New Event</Link>
+            </Button>
+          </div>
+          <div className="wrapper mt-6">
+            <Collection
+              data={organizedEvents?.data || []}
+              emptyTitle="No Events Organized"
+              emptyStateSubtext="No worries! You can explore more events by clicking the button above."
+              collectionType="Events_Organized"
+              limit={6}
+              page={
+                Array.isArray(orgPageRaw)
+                  ? orgPageRaw[0] || "1"
+                  : (orgPageRaw as string) || "1"
+              }
+              urlParamName="eventsPage"
+              total={organizedEvents?.totalPages || 0}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Optional: About card (future enhancements) */}
       {/* We can add a small about section later when bio/links exist */}

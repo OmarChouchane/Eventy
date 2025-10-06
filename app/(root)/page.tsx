@@ -131,7 +131,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
       </div>
 
       {/* Events Section */}
-      <section id="events" className="">
+      <section className="">
         <div className="h-full bg-black bg-gradient-to-b from-black via-gray-900 to-black bg-contain py-5 md:py-10">
           <h2 className="h2-bold px-10 pb-12 text-white text-center">
             Trusted by <br /> INSAT Clubs and Events
@@ -189,6 +189,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
           <div
             className="wrapper flex flex-col gap-8 md:gap-12"
             style={{ position: "relative", zIndex: 2 }}
+            id="events"
           >
             <div className="flex w-full flex-col gap-5 md:flex-row">
               <Search />
