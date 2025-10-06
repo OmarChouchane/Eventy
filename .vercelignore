@@ -1,0 +1,12 @@
+.git
+.github
+.next/cache
+node_modules
+_.log
+\*\*/_.test.\*
+**/**tests**/**
+.vscode
+.idea
+Dockerfile
+docker-compose.yml
+README.md
