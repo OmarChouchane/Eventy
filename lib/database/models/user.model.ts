@@ -28,6 +28,13 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  // Distinguish user account type: 'student' or 'club'
+  type: {
+    type: String,
+    enum: ["student", "club"],
+    default: "student",
+    required: true,
+  },
 });
 
 const User = models.User || model("User", UserSchema);

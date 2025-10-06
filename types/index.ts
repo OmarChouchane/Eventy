@@ -1,12 +1,14 @@
 // ====== USER PARAMS
+export type UserType = 'student' | 'club';
+
 export type CreateUserParams = {
-    [x: string]: any;
     clerkId: string;
     firstName: string;
     lastName: string;
     username: string;
     email: string;
     photo: string;
+    type?: UserType; // defaults to 'student' on server
   };
   
   export type UpdateUserParams = {
@@ -14,6 +16,7 @@ export type CreateUserParams = {
     lastName: string;
     username: string;
     photo: string;
+    type?: UserType;
   };
   
   // ====== EVENT PARAMS
